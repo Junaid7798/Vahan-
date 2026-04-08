@@ -1,49 +1,161 @@
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: 40 50% 98%;
+    --foreground: 24 18% 14%;
+    --card: 0 0% 100%;
+    --card-foreground: 24 18% 14%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 24 18% 14%;
+    --primary: 18 68% 42%;
+    --primary-foreground: 36 100% 97%;
+    --secondary: 38 32% 92%;
+    --secondary-foreground: 22 18% 18%;
+    --muted: 40 29% 94%;
+    --muted-foreground: 22 10% 42%;
+    --accent: 158 35% 31%;
+    --accent-foreground: 36 100% 97%;
+    --destructive: 0 76% 54%;
+    --destructive-foreground: 36 100% 97%;
+    --border: 30 24% 86%;
+    --input: 30 24% 86%;
+    --ring: 18 68% 42%;
+    --radius: 1rem;
+    --chart-1: 18 68% 42%;
+    --chart-2: 158 35% 31%;
+    --chart-3: 36 82% 52%;
+    --chart-4: 209 59% 41%;
+    --chart-5: 340 68% 48%;
+    --sidebar-accent: 22 74% 44%;
+    --sidebar-accent-foreground: 36 100% 97%;
+    --shell-bg-start: 45 73% 97%;
+    --shell-bg-end: 34 38% 92%;
+    --shell-glow: 22 78% 58%;
+    --shell-glow-secondary: 162 42% 42%;
+  }
+
+  .dark,
+  [data-theme="dark"] {
+    --background: 25 18% 10%;
+    --foreground: 36 42% 96%;
+    --card: 24 16% 12%;
+    --card-foreground: 36 42% 96%;
+    --popover: 24 16% 12%;
+    --popover-foreground: 36 42% 96%;
+    --primary: 26 76% 58%;
+    --primary-foreground: 20 24% 12%;
+    --secondary: 24 10% 18%;
+    --secondary-foreground: 36 42% 96%;
+    --muted: 24 10% 18%;
+    --muted-foreground: 32 18% 70%;
+    --accent: 158 35% 48%;
+    --accent-foreground: 24 16% 12%;
+    --destructive: 0 76% 60%;
+    --destructive-foreground: 36 42% 96%;
+    --border: 24 10% 22%;
+    --input: 24 10% 22%;
+    --ring: 26 76% 58%;
+    --chart-1: 26 76% 58%;
+    --chart-2: 158 35% 48%;
+    --chart-3: 36 82% 52%;
+    --chart-4: 209 59% 54%;
+    --chart-5: 340 68% 58%;
+    --sidebar-accent: 26 76% 58%;
+    --sidebar-accent-foreground: 20 24% 12%;
+    --shell-bg-start: 24 18% 10%;
+    --shell-bg-end: 228 16% 9%;
+    --shell-glow: 26 82% 58%;
+    --shell-glow-secondary: 186 54% 48%;
+  }
+
+  [data-accent="ocean"] {
+    --primary: 199 84% 42%;
+    --accent: 190 55% 33%;
+    --ring: 199 84% 42%;
+    --sidebar-accent: 199 84% 42%;
+    --shell-glow: 199 82% 56%;
+    --shell-glow-secondary: 166 48% 42%;
+  }
+
+  [data-accent="evergreen"] {
+    --primary: 152 58% 31%;
+    --accent: 24 75% 48%;
+    --ring: 152 58% 31%;
+    --sidebar-accent: 152 58% 31%;
+    --shell-glow: 152 58% 40%;
+    --shell-glow-secondary: 26 84% 55%;
+  }
+
+  * {
+    border-color: hsl(var(--border));
+  }
+
+  html {
+    height: 100%;
+    color-scheme: light;
+  }
+
+  html.dark,
+  html[data-theme="dark"] {
+    color-scheme: dark;
+  }
+
+  body {
+    min-height: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
+    background: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: var(--font-body), sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display), serif;
+  }
+
+  code,
+  pre,
+  kbd,
+  samp {
+    font-family: var(--font-mono), monospace;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
   }
 }
 
-html {
-  height: 100%;
-}
+@layer utilities {
+  .glass-surface {
+    background: rgba(255, 255, 255, 0.72);
+    backdrop-filter: blur(18px);
+  }
 
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
-}
+  .app-shell-background {
+    background:
+      radial-gradient(circle at top left, hsl(var(--shell-glow) / 0.18), transparent 28%),
+      radial-gradient(circle at top right, hsl(var(--shell-glow-secondary) / 0.15), transparent 22%),
+      linear-gradient(180deg, hsl(var(--shell-bg-start)) 0%, hsl(var(--shell-bg-end)) 100%);
+  }
 
-body {
-  min-height: 100%;
-  display: flex;
-  flex-direction: column;
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
+  .shell-card {
+    background: hsl(var(--card) / 0.8);
+    border-color: hsl(var(--border) / 0.72);
+    backdrop-filter: blur(20px);
   }
 }

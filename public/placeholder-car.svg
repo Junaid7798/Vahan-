@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-labelledby="title desc">
+  <title id="title">Vehicle placeholder</title>
+  <desc id="desc">Illustrated placeholder card for a vehicle image.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0%" x2="100%" y1="0%" y2="100%">
+      <stop offset="0%" stop-color="#eff6ff" />
+      <stop offset="100%" stop-color="#dbeafe" />
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#bg)" rx="32" />
+  <g fill="none" stroke="#2563eb" stroke-linecap="round" stroke-linejoin="round" stroke-width="20">
+    <path d="M190 360h420l-34-110a36 36 0 0 0-34-26H258a36 36 0 0 0-34 26z" />
+    <path d="M150 360h500a40 40 0 0 1 40 40v34H110v-34a40 40 0 0 1 40-40z" />
+    <circle cx="240" cy="434" r="46" fill="#bfdbfe" />
+    <circle cx="560" cy="434" r="46" fill="#bfdbfe" />
+    <path d="M282 250h236v90H282z" />
+  </g>
+</svg>
