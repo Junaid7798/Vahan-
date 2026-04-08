@@ -57,10 +57,10 @@ export function ForgotPasswordForm() {
   };
 
   return (
-    <Card className="w-full">
+    <Card className="auth-card w-full text-foreground shadow-[0_24px_60px_rgba(15,23,42,0.14)]">
       <CardHeader>
-        <CardTitle>{authT("forgotPasswordTitle")}</CardTitle>
-        <CardDescription>{authT("forgotPasswordDescription")}</CardDescription>
+        <CardTitle className="text-foreground">{authT("forgotPasswordTitle")}</CardTitle>
+        <CardDescription className="text-muted-foreground">{authT("forgotPasswordDescription")}</CardDescription>
       </CardHeader>
       <CardContent>
         {isSubmitted ? (
@@ -76,15 +76,15 @@ export function ForgotPasswordForm() {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <Label htmlFor="email">{authT("email")}</Label>
+                    <Label className="text-foreground" htmlFor="email">{authT("email")}</Label>
                     <FormControl>
-                      <Input id="email" placeholder="you@example.com" type="email" {...field} />
+                      <Input className="border-border/80 bg-background/70 text-foreground placeholder:text-muted-foreground" id="email" placeholder="you@example.com" type="email" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              <Button className="w-full" disabled={isLoading} type="submit">
+              <Button className="w-full bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] hover:bg-[hsl(var(--primary)/0.92)]" disabled={isLoading} type="submit">
                 {isLoading ? commonT("loading") : authT("sendResetLink")}
               </Button>
             </form>
@@ -92,7 +92,7 @@ export function ForgotPasswordForm() {
         )}
       </CardContent>
       <CardFooter>
-        <p className="text-sm text-gray-600">
+        <p className="text-sm text-muted-foreground">
           <Link className="text-primary hover:underline" href="/login">
             {authT("backToLogin")}
           </Link>

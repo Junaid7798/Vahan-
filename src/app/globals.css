@@ -141,6 +141,19 @@
 }
 
 @layer utilities {
+  .auth-shell-background {
+    background:
+      radial-gradient(circle at top left, hsl(var(--shell-glow) / 0.14), transparent 28%),
+      radial-gradient(circle at top right, hsl(var(--shell-glow-secondary) / 0.1), transparent 22%),
+      linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--shell-bg-end) / 0.28) 100%);
+  }
+
+  .auth-card {
+    background: hsl(var(--card) / 0.88);
+    border-color: hsl(var(--border) / 0.88);
+    backdrop-filter: blur(18px);
+  }
+
   .glass-surface {
     background: rgba(255, 255, 255, 0.72);
     backdrop-filter: blur(18px);

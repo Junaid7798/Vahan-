@@ -60,10 +60,10 @@ export function LoginForm() {
   };
 
   return (
-    <Card className="w-full">
+    <Card className="auth-card w-full text-foreground shadow-[0_24px_60px_rgba(15,23,42,0.14)]">
       <CardHeader>
-        <CardTitle>{authT("login")}</CardTitle>
-        <CardDescription>{authT("loginDescription")}</CardDescription>
+        <CardTitle className="text-foreground">{authT("login")}</CardTitle>
+        <CardDescription className="text-muted-foreground">{authT("loginDescription")}</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -71,34 +71,34 @@ export function LoginForm() {
             {error ? <div className="rounded-md bg-red-50 p-3 text-sm text-red-600">{error}</div> : null}
             <FormField control={form.control} name="email" render={({ field }) => (
               <FormItem>
-                <Label htmlFor="email">{authT("email")}</Label>
-                <FormControl><Input id="email" placeholder="you@example.com" type="email" {...field} /></FormControl>
+                <Label className="text-foreground" htmlFor="email">{authT("email")}</Label>
+                <FormControl><Input className="border-border/80 bg-background/70 text-foreground placeholder:text-muted-foreground" id="email" placeholder="you@example.com" type="email" {...field} /></FormControl>
                 <FormMessage />
               </FormItem>
             )} />
             <FormField control={form.control} name="password" render={({ field }) => (
               <FormItem>
-                <Label htmlFor="password">{authT("password")}</Label>
-                <FormControl><Input id="password" placeholder="Enter your password" type="password" {...field} /></FormControl>
+                <Label className="text-foreground" htmlFor="password">{authT("password")}</Label>
+                <FormControl><Input className="border-border/80 bg-background/70 text-foreground placeholder:text-muted-foreground" id="password" placeholder="Enter your password" type="password" {...field} /></FormControl>
                 <FormMessage />
               </FormItem>
             )} />
-            <Button className="w-full" disabled={isLoading} type="submit">
+            <Button className="w-full bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] hover:bg-[hsl(var(--primary)/0.92)]" disabled={isLoading} type="submit">
               {isLoading ? commonT("loading") : authT("login")}
             </Button>
           </form>
         </Form>
       </CardContent>
       <CardFooter className="flex flex-col gap-4">
-        <div className="rounded-lg border bg-muted/40 p-3 text-xs text-muted-foreground">
+        <div className="rounded-lg border border-border/70 bg-[hsl(var(--muted)/0.8)] p-3 text-xs text-foreground/80">
           {authT("demoAccounts")}
         </div>
-        <p className="text-center text-sm text-gray-600">
+        <p className="text-center text-sm text-muted-foreground">
           <Link className="text-primary hover:underline" href="/forgot-password">
             {authT("forgotPassword")}
           </Link>
         </p>
-        <p className="text-sm text-gray-600">
+        <p className="text-sm text-muted-foreground">
           {authT("dontHaveAccount")}{" "}
           <Link className="text-primary hover:underline" href="/signup">{authT("signup")}</Link>
         </p>

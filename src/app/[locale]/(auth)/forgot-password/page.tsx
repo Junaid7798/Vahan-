@@ -7,8 +7,8 @@ export default async function ForgotPasswordPage() {
   return (
     <div className="w-full max-w-md">
       <div className="mb-8 text-center">
-        <h1 className="text-2xl font-bold text-gray-900">{authT("portalTitle")}</h1>
-        <p className="mt-2 text-gray-600">{authT("forgotPasswordSubtitle")}</p>
+        <h1 className="text-2xl font-bold text-foreground">{authT("portalTitle")}</h1>
+        <p className="mt-2 text-muted-foreground">{authT("forgotPasswordSubtitle")}</p>
       </div>
       <ForgotPasswordForm />
     </div>

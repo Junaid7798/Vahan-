@@ -13,3 +13,4 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - Forms should minimize typing on mobile. Prefer step-based or grouped flows, thumb-friendly actions, and the right keyboard/input mode for numeric or phone fields.
 - Keep future Android and iOS packaging viable. Avoid web-only assumptions in business logic, file flows, auth flows, and navigation when a shared mobile shell or native wrapper is likely later.
 - When planning major UI work, include a note on whether the change is compatible with a future PWA-to-APK/IPA path and what blockers remain.
+- For public or auth-facing routes, do not mix fixed light backgrounds with theme-token text colors. Keep the full surface theme-aware or explicitly set both background and foreground together.

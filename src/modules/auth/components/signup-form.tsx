@@ -81,10 +81,10 @@ export function SignupForm() {
   };
 
   return (
-    <Card className="w-full">
+    <Card className="auth-card w-full text-foreground shadow-[0_24px_60px_rgba(15,23,42,0.14)]">
       <CardHeader>
-        <CardTitle>{authT("signup")}</CardTitle>
-        <CardDescription>{authT("signupDescription")}</CardDescription>
+        <CardTitle className="text-foreground">{authT("signup")}</CardTitle>
+        <CardDescription className="text-muted-foreground">{authT("signupDescription")}</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -99,9 +99,9 @@ export function SignupForm() {
               name="fullName"
               render={({ field }) => (
                 <FormItem>
-                  <Label htmlFor="fullName">{authT("fullName")}</Label>
+                  <Label className="text-foreground" htmlFor="fullName">{authT("fullName")}</Label>
                   <FormControl>
-                    <Input id="fullName" placeholder="John Doe" {...field} />
+                    <Input className="border-border/80 bg-background/70 text-foreground placeholder:text-muted-foreground" id="fullName" placeholder="John Doe" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -112,9 +112,9 @@ export function SignupForm() {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <Label htmlFor="email">{authT("email")}</Label>
+                  <Label className="text-foreground" htmlFor="email">{authT("email")}</Label>
                   <FormControl>
-                    <Input id="email" placeholder="you@example.com" type="email" {...field} />
+                    <Input className="border-border/80 bg-background/70 text-foreground placeholder:text-muted-foreground" id="email" placeholder="you@example.com" type="email" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -125,9 +125,9 @@ export function SignupForm() {
               name="phone"
               render={({ field }) => (
                 <FormItem>
-                  <Label htmlFor="phone">{authT("phone")}</Label>
+                  <Label className="text-foreground" htmlFor="phone">{authT("phone")}</Label>
                   <FormControl>
-                    <Input id="phone" placeholder="9876543210" type="tel" {...field} />
+                    <Input className="border-border/80 bg-background/70 text-foreground placeholder:text-muted-foreground" id="phone" placeholder="9876543210" type="tel" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -138,9 +138,9 @@ export function SignupForm() {
               name="city"
               render={({ field }) => (
                 <FormItem>
-                  <Label htmlFor="city">{authT("city")}</Label>
+                  <Label className="text-foreground" htmlFor="city">{authT("city")}</Label>
                   <FormControl>
-                    <Input id="city" placeholder="Mumbai" {...field} />
+                    <Input className="border-border/80 bg-background/70 text-foreground placeholder:text-muted-foreground" id="city" placeholder="Mumbai" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -151,9 +151,10 @@ export function SignupForm() {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <Label htmlFor="password">{authT("password")}</Label>
+                  <Label className="text-foreground" htmlFor="password">{authT("password")}</Label>
                   <FormControl>
                     <Input
+                      className="border-border/80 bg-background/70 text-foreground placeholder:text-muted-foreground"
                       id="password"
                       placeholder="Create a password"
                       type="password"
@@ -169,9 +170,10 @@ export function SignupForm() {
               name="confirmPassword"
               render={({ field }) => (
                 <FormItem>
-                  <Label htmlFor="confirmPassword">{authT("confirmPassword")}</Label>
+                  <Label className="text-foreground" htmlFor="confirmPassword">{authT("confirmPassword")}</Label>
                   <FormControl>
                     <Input
+                      className="border-border/80 bg-background/70 text-foreground placeholder:text-muted-foreground"
                       id="confirmPassword"
                       placeholder="Confirm your password"
                       type="password"
@@ -182,14 +184,14 @@ export function SignupForm() {
                 </FormItem>
               )}
             />
-            <Button className="w-full" disabled={isLoading} type="submit">
+            <Button className="w-full bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] hover:bg-[hsl(var(--primary)/0.92)]" disabled={isLoading} type="submit">
               {isLoading ? commonT("loading") : authT("createAccount")}
             </Button>
           </form>
         </Form>
       </CardContent>
       <CardFooter className="flex flex-col gap-4">
-        <p className="text-sm text-gray-600">
+        <p className="text-sm text-muted-foreground">
           {authT("alreadyHaveAccount")}{" "}
           <Link className="text-primary hover:underline" href="/login">
             {authT("login")}
