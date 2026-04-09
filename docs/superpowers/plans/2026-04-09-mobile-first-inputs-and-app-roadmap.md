@@ -8,6 +8,21 @@ This roadmap captures the next-session product direction:
 - the web app must be optimized primarily for mobile users
 - the architecture should stay compatible with future Android and iOS app packaging
 
+## Status Update
+
+Completed in the latest implementation pass:
+
+- shared theme-safe shell controls and token cleanup across the main app shell
+- mobile-first restructuring of the vehicle create/edit and seller-upload flows
+- predictive pickers for make, model, variant, location, city, and inventory make filters
+- mobile-safe seller submission queue cards and tighter chat composer layout
+
+Still remaining from this roadmap:
+
+- lower-priority admin route audit for spacing and localization
+- formal PWA readiness checklist
+- production data, private media, plate blur, and offline-queue follow-through
+
 ## Product Assumptions
 
 - Real usage is expected to be 95%+ mobile.
@@ -73,6 +88,33 @@ Priority fields:
 - Keep tap targets large and clearly separated.
 - Reduce decorative background weight where it competes with form readability.
 
+### Theme System Direction
+
+The next UI pass should treat theme work as a shared system task, not isolated page polish.
+
+Required outcomes:
+
+- unify theme behavior across public auth pages and authenticated app pages
+- remove fixed colors where they fight the active theme tokens
+- keep all surfaces readable in light, dark, and accent variations
+- make mobile forms, sheets, and cards the first contrast target
+- reduce washed-out states on pale backgrounds and muddy states on dark backgrounds
+
+Priority theme surfaces:
+
+- auth shell and auth cards
+- topbar and language or appearance controls
+- add and edit vehicle flow
+- mobile bottom sheets, selects, and dialogs
+- inventory cards, filters, and empty states
+
+Verification requirements:
+
+- test at 360px to 430px widths first
+- verify placeholder text, helper text, disabled states, and pressed states
+- verify Hindi and English both remain readable
+- verify the deployed Vercel build after any theme token change
+
 ### Critical Flows To Rework
 
 1. Vehicle create and edit
@@ -136,10 +178,11 @@ Phase 4:
 
 ## Next Session Execution Order
 
-1. Rework the add/edit vehicle form for mobile-first layout and smarter inputs.
-2. Introduce predictive make/model selection and simple pickers for short enums.
-3. Audit the highest-traffic mobile screens and tighten spacing, actions, and hierarchy.
-4. Define the PWA-to-APK/IPA readiness checklist and identify current blockers.
+1. Run a shared theme-system pass across auth and core app surfaces, starting with mobile contrast and token consistency.
+2. Rework the add/edit vehicle form for mobile-first layout and smarter inputs.
+3. Introduce predictive make/model selection and simple pickers for short enums.
+4. Audit the highest-traffic mobile screens and tighten spacing, actions, and hierarchy.
+5. Define the PWA-to-APK/IPA readiness checklist and identify current blockers.
 
 ## Known Current Gaps
 
@@ -147,3 +190,4 @@ Phase 4:
 - Long-text and numeric fields are not yet tuned for mobile keyboards and progressive disclosure.
 - Predictive selection is not implemented for large option sets.
 - The app does not yet have a documented PWA readiness checklist for future packaging.
+- Theme behavior is improved but still not fully unified across all surfaces, especially after deployment and on smaller mobile screens.

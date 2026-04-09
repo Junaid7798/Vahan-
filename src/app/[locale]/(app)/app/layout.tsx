@@ -33,11 +33,11 @@ export default async function AppLayout({
   return (
     <div className="app-shell-background min-h-screen text-foreground">
       <div className="flex min-h-screen">
-        <aside className="hidden w-[292px] shrink-0 border-r border-white/30 bg-white/10 md:block">
+        <aside className="shell-card hidden w-[292px] shrink-0 border-r md:block">
           <AppSidebar role={viewer.profile.role} />
         </aside>
         <div className="flex min-h-screen flex-1 flex-col">
-          <header className="sticky top-0 z-20 border-b border-white/40 bg-[hsl(var(--background)/0.7)] px-4 py-4 backdrop-blur lg:px-6">
+          <header className="sticky top-0 z-20 border-b border-border/60 bg-[hsl(var(--background)/0.72)] px-4 py-4 backdrop-blur lg:px-6">
             <AppTopbar
               initials={getInitials(viewer.profile.full_name, viewer.user.email)}
               notifications={notifications}

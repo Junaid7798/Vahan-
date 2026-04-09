@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { SearchableSelect } from "@/components/ui/searchable-select";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   FUEL_FILTER_OPTIONS,
@@ -64,6 +65,7 @@ interface VehicleGridFilters {
 }
 
 const DEFAULT_FILTERS = { fuelType: "all", make: "all", transmission: "all" } as const;
+const filterTriggerClassName = "h-11 w-full rounded-2xl border-border/60 bg-background/80";
 
 export function VehicleGrid({
   vehicles,
@@ -115,15 +117,15 @@ export function VehicleGrid({
       <div className="shell-card flex flex-col gap-4 rounded-[28px] border p-4 shadow-sm xl:flex-row xl:items-center xl:justify-between">
         <div className="relative w-full max-w-md">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input className="pl-9" placeholder={inventoryT("searchPlaceholder")} value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} />
+          <Input className="h-11 rounded-2xl border-border/60 bg-background/80 pl-9" placeholder={inventoryT("searchPlaceholder")} value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} />
         </div>
 
         <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
-          <FilterSelect items={makeOptions} placeholder={inventoryT("make")} value={filters.make} onValueChange={(value) => setFilters((current) => ({ ...current, make: value }))} />
+          <SearchableSelect clearLabel={inventoryT("allMakes")} emptyLabel={inventoryT("noVehicles")} label={inventoryT("make")} options={makeOptions} placeholder={inventoryT("make")} searchPlaceholder={inventoryT("searchPlaceholder")} triggerClassName="sm:w-[190px]" value={filters.make === "all" ? "" : filters.make} onValueChange={(value) => setFilters((current) => ({ ...current, make: value || DEFAULT_FILTERS.make }))} />
           <FilterSelect items={fuelOptions} placeholder={inventoryT("fuelType")} value={filters.fuelType} onValueChange={(value) => setFilters((current) => ({ ...current, fuelType: value }))} />
           <FilterSelect items={transmissionOptions} placeholder={inventoryT("transmission")} value={filters.transmission} onValueChange={(value) => setFilters((current) => ({ ...current, transmission: value }))} />
 
-          <div className="flex rounded-xl border border-border/60 bg-background">
+          <div className="flex rounded-2xl border border-border/60 bg-background/80">
             <Button type="button" variant={viewMode === "grid" ? "secondary" : "ghost"} size="icon" aria-label={inventoryT("showGridView")} onClick={() => setViewMode("grid")}>
               <Grid className="h-4 w-4" />
             </Button>
@@ -199,7 +201,7 @@ function FilterSelect({
 }) {
   return (
     <Select value={value} onValueChange={onValueChange}>
-      <SelectTrigger className="w-full sm:w-[160px]">
+      <SelectTrigger className={`${filterTriggerClassName} sm:w-[160px]`}>
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
       <SelectContent>

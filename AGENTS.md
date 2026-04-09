@@ -14,3 +14,5 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - Keep future Android and iOS packaging viable. Avoid web-only assumptions in business logic, file flows, auth flows, and navigation when a shared mobile shell or native wrapper is likely later.
 - When planning major UI work, include a note on whether the change is compatible with a future PWA-to-APK/IPA path and what blockers remain.
 - For public or auth-facing routes, do not mix fixed light backgrounds with theme-token text colors. Keep the full surface theme-aware or explicitly set both background and foreground together.
+- Theme work should be system work, not one-off color patches. Prefer updating shared tokens, surfaces, and states before touching individual screens.
+- When changing themes, verify contrast and readability on mobile first across auth, forms, sheets, cards, inputs, and empty states.

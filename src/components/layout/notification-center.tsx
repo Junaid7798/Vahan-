@@ -34,10 +34,10 @@ export function NotificationCenter({ items }: NotificationCenterProps) {
       <DropdownMenuTrigger asChild>
         <Button
           aria-label={t("title")}
-          className="relative rounded-2xl"
+          className="shell-control relative rounded-2xl"
           size="icon"
           type="button"
-          variant="ghost"
+          variant="outline"
         >
           <Bell className="h-4 w-4" />
           {items.length > 0 ? (
@@ -47,7 +47,7 @@ export function NotificationCenter({ items }: NotificationCenterProps) {
           ) : null}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-[340px] rounded-2xl p-2">
+      <DropdownMenuContent align="end" className="sheet-surface w-[340px] rounded-2xl p-2">
         <DropdownMenuLabel className="flex items-center justify-between gap-3">
           <span>{t("title")}</span>
           <Badge variant="secondary">{items.length}</Badge>

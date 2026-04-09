@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { Link, useRouter } from "@/i18n/routing";
 import { patchPortalAction, postPortalAction } from "@/lib/demo/portal-client";
 import { SellerSubmissionInput, SellerSubmissionRecord } from "@/lib/demo/portal-types";
@@ -16,27 +17,22 @@ interface MySubmissionsPanelProps {
   rows: Array<SellerSubmissionRecord & { linkedListingTitle?: string }>;
 }
 
-function getStatusLabel(locale: string, status: SellerSubmissionRecord["status"]) {
-  const labels = locale === "hi"
-    ? { changes_requested: "बदलाव चाहिए", pending: "लंबित", rejected: "अस्वीकृत", reviewed: "समीक्षित" }
-    : { changes_requested: "Changes requested", pending: "Pending", rejected: "Rejected", reviewed: "Reviewed" };
-
-  return labels[status];
-}
-
 export function MySubmissionsPanel({ defaultSeller, locale, rows }: MySubmissionsPanelProps) {
+  const t = useTranslations("submissions");
+  const statusT = useTranslations("status");
   const [editingId, setEditingId] = useState<string | "new" | null>(rows.length ? null : "new");
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
-  const activeRecord = useMemo(() => rows.find((row) => row.id === editingId) ?? null, [editingId, rows]);
-  const copy = locale === "hi"
-    ? { add: "नया वाहन जोड़ें", empty: "आपके अपलोड यहां दिखाई देंगे।", remove: "हटाएं", save: "अपलोड सहेजें", title: "मेरे अपलोड", updated: "अपडेट किया गया", uploaded: "अपलोड किया गया" }
-    : { add: "Add vehicle upload", empty: "Your uploads will appear here once you start a submission.", remove: "Remove", save: "Save upload", title: "My uploads", updated: "Updated", uploaded: "Uploaded" };
+  const activeRecord = rows.find((row) => row.id === editingId) ?? null;
 
   function refreshAfterSuccess(title: string, description: string) {
     toast({ title, description });
     setEditingId(null);
     router.refresh();
+  }
+
+  function getStatusLabel(status: SellerSubmissionRecord["status"]) {
+    return status === "changes_requested" ? t("changesRequested") : statusT(status);
   }
 
   function saveSubmission(submissionId: string | null) {
@@ -45,18 +41,14 @@ export function MySubmissionsPanel({ defaultSeller, locale, rows }: MySubmission
         try {
           if (submissionId) {
             await patchPortalAction("edit_submission", { submissionId, ...payload });
-            refreshAfterSuccess("Upload updated", "Your vehicle submission is back in the review queue.");
+            refreshAfterSuccess(t("updatedTitle"), t("updatedDescription"));
             return;
           }
 
           await postPortalAction("create_submission", payload);
-          refreshAfterSuccess("Upload created", "Your vehicle was added to the seller intake queue.");
+          refreshAfterSuccess(t("createdTitle"), t("createdDescription"));
         } catch (error) {
-          toast({
-            title: "Save failed",
-            description: error instanceof Error ? error.message : "The upload could not be saved.",
-            variant: "destructive",
-          });
+          toast({ title: t("saveFailedTitle"), description: error instanceof Error ? error.message : t("saveFailedDescription"), variant: "destructive" });
         }
       });
     };
@@ -66,13 +58,9 @@ export function MySubmissionsPanel({ defaultSeller, locale, rows }: MySubmission
     startTransition(async () => {
       try {
         await patchPortalAction("delete_submission", { submissionId });
-        refreshAfterSuccess("Upload removed", "The vehicle submission was deleted.");
+        refreshAfterSuccess(t("removedTitle"), t("removedDescription"));
       } catch (error) {
-        toast({
-          title: "Delete failed",
-          description: error instanceof Error ? error.message : "The upload could not be removed.",
-          variant: "destructive",
-        });
+        toast({ title: t("deleteFailedTitle"), description: error instanceof Error ? error.message : t("deleteFailedDescription"), variant: "destructive" });
       }
     });
   }
@@ -81,12 +69,10 @@ export function MySubmissionsPanel({ defaultSeller, locale, rows }: MySubmission
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="space-y-1">
-          <h2 className="text-xl font-semibold">{copy.title}</h2>
-          <p className="text-sm text-muted-foreground">{copy.empty}</p>
+          <h2 className="text-xl font-semibold">{t("title")}</h2>
+          <p className="text-sm text-muted-foreground">{t("description")}</p>
         </div>
-        <Button disabled={isPending} type="button" onClick={() => setEditingId("new")}>
-          {copy.add}
-        </Button>
+        <Button disabled={isPending} type="button" onClick={() => setEditingId("new")}>{t("add")}</Button>
       </div>
 
       <div className="grid gap-4">
@@ -94,34 +80,26 @@ export function MySubmissionsPanel({ defaultSeller, locale, rows }: MySubmission
           const canEdit = !row.linkedListingId && (row.status === "pending" || row.status === "changes_requested");
 
           return (
-            <Card key={row.id} className="border-border/60 bg-card/90 shadow-sm">
-              <CardHeader className="flex flex-row items-start justify-between gap-4">
+            <Card key={row.id} className="section-surface shadow-sm">
+              <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div className="space-y-2">
                   <CardTitle className="text-lg">{row.vehicleSummary}</CardTitle>
                   <div className="flex flex-wrap gap-2">
-                    <Badge variant="secondary">{getStatusLabel(locale, row.status)}</Badge>
-                    {row.linkedListingId ? <Badge>{row.linkedListingTitle ?? "Live listing created"}</Badge> : null}
+                    <Badge variant="secondary">{getStatusLabel(row.status)}</Badge>
+                    {row.linkedListingId ? <Badge>{row.linkedListingTitle ?? t("liveListingCreated")}</Badge> : null}
                   </div>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  {row.linkedListingId ? (
-                    <Button asChild size="sm" variant="outline">
-                      <Link href={`/app/vehicles/${row.linkedListingId}`}>Open listing</Link>
-                    </Button>
-                  ) : null}
-                  <Button disabled={isPending || !canEdit} size="sm" type="button" variant="outline" onClick={() => setEditingId(row.id)}>
-                    Edit
-                  </Button>
-                  <Button disabled={isPending || !canEdit} size="sm" type="button" variant="destructive" onClick={() => deleteSubmission(row.id)}>
-                    {copy.remove}
-                  </Button>
+                  {row.linkedListingId ? <Button asChild size="sm" variant="outline"><Link href={`/app/vehicles/${row.linkedListingId}`}>{t("openListing")}</Link></Button> : null}
+                  <Button disabled={isPending || !canEdit} size="sm" type="button" variant="outline" onClick={() => setEditingId(row.id)}>{t("edit")}</Button>
+                  <Button disabled={isPending || !canEdit} size="sm" type="button" variant="destructive" onClick={() => deleteSubmission(row.id)}>{t("remove")}</Button>
                 </div>
               </CardHeader>
               <CardContent className="space-y-3 text-sm text-muted-foreground">
                 <p>{row.description}</p>
                 <div className="flex flex-wrap gap-4">
-                  <span>{copy.uploaded}: {new Date(row.submittedAt).toLocaleDateString(locale === "hi" ? "hi-IN" : "en-IN")}</span>
-                  <span>{copy.updated}: {new Date(row.updatedAt).toLocaleDateString(locale === "hi" ? "hi-IN" : "en-IN")}</span>
+                  <span>{t("uploadedOn")}: {new Date(row.submittedAt).toLocaleDateString(locale === "hi" ? "hi-IN" : "en-IN")}</span>
+                  <span>{t("updatedOn")}: {new Date(row.updatedAt).toLocaleDateString(locale === "hi" ? "hi-IN" : "en-IN")}</span>
                 </div>
               </CardContent>
             </Card>
@@ -138,8 +116,8 @@ export function MySubmissionsPanel({ defaultSeller, locale, rows }: MySubmission
           locale={locale}
           onCancel={() => setEditingId(null)}
           onSubmit={saveSubmission(activeRecord?.id ?? null)}
-          submitLabel={copy.save}
-          title={editingId === "new" ? copy.add : "Edit vehicle upload"}
+          submitLabel={t("save")}
+          title={editingId === "new" ? t("add") : t("editUpload")}
         />
       ) : null}
     </div>

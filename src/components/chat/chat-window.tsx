@@ -109,7 +109,7 @@ export function ChatWindow({ thread, messages, onSendMessage, isLoading }: ChatW
   }
 
   return (
-    <Card className="flex h-[640px] flex-col rounded-[28px] border border-border/60 bg-card/90 shadow-sm">
+    <Card className="flex min-h-[72vh] flex-col rounded-[28px] border border-border/60 bg-card/90 shadow-sm md:h-[640px] md:min-h-0">
       <CardHeader className="border-b border-border/60 px-5 py-4">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
@@ -130,7 +130,7 @@ export function ChatWindow({ thread, messages, onSendMessage, isLoading }: ChatW
           {isLoading ? <div className="text-center text-sm text-muted-foreground">{chatT("updatingConversation")}</div> : null}
           {messages.map((message) => (
             <div key={message.id} className={`flex ${message.is_own ? "justify-end" : "justify-start"}`}>
-              <div className={`max-w-[70%] rounded-2xl px-4 py-3 ${message.is_own ? "bg-primary text-primary-foreground" : "bg-muted"}`}>
+              <div className={`max-w-[85%] rounded-2xl px-4 py-3 sm:max-w-[70%] ${message.is_own ? "bg-primary text-primary-foreground" : "bg-muted"}`}>
                 {message.message_type === "voice" ? (
                   <div className="space-y-2">
                     <p className="text-sm font-medium">{chatT("voiceNote")}</p>
@@ -154,13 +154,13 @@ export function ChatWindow({ thread, messages, onSendMessage, isLoading }: ChatW
       </ScrollArea>
 
       <div className="border-t border-border/60 p-4">
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2 sm:flex-nowrap">
           <Input
+            className="h-11 flex-1 rounded-2xl border-border/60 bg-background/80"
             placeholder={chatT("typeMessage")}
             value={messageInput}
             onChange={(event) => setMessageInput(event.target.value)}
             onKeyDown={(event) => event.key === "Enter" && handleSend()}
-            className="flex-1"
           />
           {isRecording ? (
             <Button type="button" variant="destructive" size="icon" onClick={stopRecording} aria-label={chatT("stopRecording")}>
@@ -191,7 +191,7 @@ export function ChatThreadList({ threads, selectedThreadId, onSelectThread }: Ch
   const chatT = useTranslations("chat");
 
   return (
-    <Card className="rounded-[28px] border border-border/60 bg-card/90 shadow-sm">
+    <Card className="overflow-hidden rounded-[28px] border border-border/60 bg-card/90 shadow-sm">
       <CardHeader>
         <CardTitle>{chatT("title")}</CardTitle>
       </CardHeader>

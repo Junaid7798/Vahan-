@@ -12,7 +12,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { SearchableSelect } from "@/components/ui/searchable-select";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { getCityOptions } from "@/lib/vehicle/form-options";
 
 interface ProfileFormProps {
   approvalStatus: string;
@@ -78,7 +80,7 @@ export function ProfileForm(props: ProfileFormProps) {
             <Input value={form.phone} onChange={(event) => setForm((current) => ({ ...current, phone: event.target.value }))} />
           </Field>
           <Field label={profileT("city")}>
-            <Input value={form.city} onChange={(event) => setForm((current) => ({ ...current, city: event.target.value }))} />
+            <SearchableSelect allowCustomValue emptyLabel={profileT("city")} label={profileT("city")} options={getCityOptions()} placeholder={profileT("city")} searchPlaceholder={profileT("citySearchPlaceholder")} value={form.city} onValueChange={(value) => setForm((current) => ({ ...current, city: value }))} />
           </Field>
           <Field label={profileT("language")}>
             <Select value={form.preferredLocale} onValueChange={(value: PortalLocale) => setForm((current) => ({ ...current, preferredLocale: value }))}>

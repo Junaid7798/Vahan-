@@ -77,16 +77,16 @@ export function AppTopbar({ initials, notifications, role }: AppTopbarProps) {
           </SheetContent>
         </Sheet>
 
-        <div>
+        <div className="min-w-0">
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">{topbarT("workspace")}</p>
-          <p className="text-sm text-foreground/80">{topbarT("workspaceSubtitle")}</p>
+          <p className="truncate text-sm text-foreground/80">{topbarT("workspaceSubtitle")}</p>
         </div>
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center justify-end gap-2">
         <Sheet open={isCommandOpen} onOpenChange={setIsCommandOpen}>
           <SheetTrigger asChild>
-            <Button className="hidden items-center gap-2 rounded-2xl border-border/60 bg-white/80 px-4 text-muted-foreground shadow-sm md:flex" type="button" variant="outline">
+            <Button className="shell-control hidden items-center gap-2 rounded-2xl px-4 text-muted-foreground md:flex" type="button" variant="outline">
               <Search className="h-4 w-4" />
               {topbarT("quickActions")}
               <span className="rounded-full border border-border/60 px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
@@ -94,13 +94,13 @@ export function AppTopbar({ initials, notifications, role }: AppTopbarProps) {
               </span>
             </Button>
           </SheetTrigger>
-          <SheetContent className="w-full max-w-md rounded-l-[28px] border-border/60 bg-white/95 p-0" side="right">
+          <SheetContent className="sheet-surface w-full max-w-md rounded-l-[28px] border-border/70 p-0" side="right">
             <div className="space-y-5 p-5">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">{topbarT("quickActions")}</p>
                 <h2 className="mt-1 text-2xl font-semibold tracking-tight">{topbarT("moveFaster")}</h2>
               </div>
-              <Input placeholder={topbarT("searchActions")} value={commandQuery} onChange={(event) => setCommandQuery(event.target.value)} />
+              <Input className="h-11 rounded-2xl border-border/60 bg-background/85" placeholder={topbarT("searchActions")} value={commandQuery} onChange={(event) => setCommandQuery(event.target.value)} />
               <div className="space-y-2">
                 {filteredActions.map((action) => (
                   <Button
@@ -121,11 +121,15 @@ export function AppTopbar({ initials, notifications, role }: AppTopbarProps) {
           </SheetContent>
         </Sheet>
 
+        <Button className="shell-control rounded-2xl md:hidden" size="icon" type="button" variant="outline" onClick={() => setIsCommandOpen(true)}>
+          <Search className="h-4 w-4" />
+        </Button>
+
         <NotificationCenter items={notifications} />
         <TopbarLocaleSwitcher />
         <AppearanceSwitcher />
 
-        <Button aria-label={topbarT("profile")} asChild className="rounded-full bg-[hsl(var(--sidebar-accent))] text-[hsl(var(--sidebar-accent-foreground))] hover:bg-[hsl(var(--sidebar-accent))]" size="icon" variant="ghost">
+        <Button aria-label={topbarT("profile")} asChild className="rounded-full bg-[hsl(var(--sidebar-accent))] text-[hsl(var(--sidebar-accent-foreground))] shadow-sm hover:bg-[hsl(var(--sidebar-accent))]" size="icon" variant="ghost">
           <Link href="/app/profile">
             <span className="flex h-9 w-9 items-center justify-center rounded-full text-sm font-semibold">{initials}</span>
           </Link>

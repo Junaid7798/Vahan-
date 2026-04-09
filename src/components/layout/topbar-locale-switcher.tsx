@@ -34,15 +34,15 @@ export function TopbarLocaleSwitcher() {
       <DropdownMenuTrigger asChild>
         <Button
           aria-label={topbarT("language")}
-          className="rounded-2xl"
+          className="shell-control rounded-2xl"
           size="icon"
           type="button"
-          variant="ghost"
+          variant="outline"
         >
           <Globe className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-52 rounded-2xl p-2">
+      <DropdownMenuContent align="end" className="sheet-surface w-52 rounded-2xl p-2">
         <DropdownMenuLabel>{topbarT("language")}</DropdownMenuLabel>
         <DropdownMenuRadioGroup
           value={currentLocale}

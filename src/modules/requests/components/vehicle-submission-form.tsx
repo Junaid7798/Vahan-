@@ -1,14 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { type ReactNode, useState } from "react";
+import { useTranslations } from "next-intl";
+import { FormSection, StickyFormFooter } from "@/components/forms/form-shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { SearchableSelect } from "@/components/ui/searchable-select";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/hooks/use-toast";
 import { SellerSubmissionInput, SellerSubmissionRecord } from "@/lib/demo/portal-types";
 import { CompressedImageResult } from "@/lib/media/compress-image";
 import { PhotoUploadField } from "@/modules/inventory/components/photo-upload-field";
+import { getCityOptions, getMakeOptions, getModelOptions, getVariantOptions } from "@/lib/vehicle/form-options";
 
 interface VehicleSubmissionFormProps {
   defaultSeller: { email: string; phone: string; sellerName: string };
@@ -22,44 +26,23 @@ interface VehicleSubmissionFormProps {
 }
 
 interface VehicleSubmissionState {
-  askingPrice: string;
-  description: string;
-  email: string;
-  location: string;
-  make: string;
-  mileage: string;
-  model: string;
-  phone: string;
-  sellerName: string;
-  variant: string;
-  year: string;
+  askingPrice: string; description: string; email: string; location: string; make: string; mileage: string; model: string; phone: string; sellerName: string; variant: string; year: string;
 }
 
+const inputClassName = "h-11 rounded-2xl border-border/60 bg-background/80";
+const textareaClassName = "min-h-28 rounded-[24px] border-border/60 bg-background/80";
 const MIN_YEAR = 1990;
 
 function toFormState(defaultSeller: VehicleSubmissionFormProps["defaultSeller"], record?: SellerSubmissionRecord | null): VehicleSubmissionState {
   return {
-    askingPrice: record?.askingPrice?.toString() ?? "",
-    description: record?.description ?? "",
-    email: record?.email ?? defaultSeller.email,
-    location: record?.location ?? "",
-    make: record?.make ?? "",
-    mileage: record?.mileage?.toString() ?? "",
-    model: record?.model ?? "",
-    phone: record?.phone ?? defaultSeller.phone,
-    sellerName: record?.sellerName ?? defaultSeller.sellerName,
-    variant: record?.variant ?? "",
-    year: record?.year?.toString() ?? "",
+    askingPrice: record?.askingPrice?.toString() ?? "", description: record?.description ?? "", email: record?.email ?? defaultSeller.email, location: record?.location ?? "",
+    make: record?.make ?? "", mileage: record?.mileage?.toString() ?? "", model: record?.model ?? "", phone: record?.phone ?? defaultSeller.phone,
+    sellerName: record?.sellerName ?? defaultSeller.sellerName, variant: record?.variant ?? "", year: record?.year?.toString() ?? "",
   };
 }
 
 function toMediaState(record?: SellerSubmissionRecord | null): CompressedImageResult[] {
-  return (record?.media ?? []).map((item) => ({
-    compressedSize: 0,
-    dataUrl: item.storagePath,
-    fileName: item.id,
-    originalSize: 0,
-  }));
+  return (record?.media ?? []).map((item) => ({ compressedSize: 0, dataUrl: item.storagePath, fileName: item.id, originalSize: 0 }));
 }
 
 function toOptionalNumber(value: string) {
@@ -67,99 +50,75 @@ function toOptionalNumber(value: string) {
 }
 
 export function VehicleSubmissionForm(props: VehicleSubmissionFormProps) {
+  const t = useTranslations("submissionForm");
+  const vehicleT = useTranslations("vehicle");
   const [form, setForm] = useState<VehicleSubmissionState>(toFormState(props.defaultSeller, props.initialRecord));
   const [media, setMedia] = useState<CompressedImageResult[]>(toMediaState(props.initialRecord));
-  const labels = props.locale === "hi"
-    ? { contact: "संपर्क जानकारी", details: "वाहन जानकारी", submitError: "कृपया सभी आवश्यक फ़ील्ड भरें।", yearError: "कृपया सही वर्ष दर्ज करें।" }
-    : { contact: "Contact details", details: "Vehicle details", submitError: "Fill in the required fields before saving.", yearError: "Enter a valid vehicle year." };
+  const modelOptions = getModelOptions(form.make);
+  const variantOptions = getVariantOptions(form.make, form.model);
 
   async function handleSubmit() {
     if (!form.sellerName.trim() || !form.phone.trim() || !form.make.trim() || !form.model.trim() || !form.description.trim()) {
-      toast({ title: labels.submitError, variant: "destructive" });
+      toast({ title: t("missingRequiredTitle"), description: t("missingRequiredDescription"), variant: "destructive" });
       return;
     }
 
     const year = Number(form.year);
     if (!Number.isInteger(year) || year < MIN_YEAR || year > new Date().getFullYear() + 1) {
-      toast({ title: labels.yearError, variant: "destructive" });
+      toast({ title: t("invalidYearTitle"), description: t("invalidYearDescription"), variant: "destructive" });
       return;
     }
 
     await props.onSubmit({
-      askingPrice: toOptionalNumber(form.askingPrice),
-      description: form.description.trim(),
-      email: form.email.trim() || undefined,
-      location: form.location.trim() || undefined,
-      make: form.make.trim(),
-      media: media.map((item, index) => ({ displayOrder: index + 1, storagePath: item.dataUrl })),
-      mileage: toOptionalNumber(form.mileage),
-      model: form.model.trim(),
-      phone: form.phone.trim(),
-      sellerName: form.sellerName.trim(),
-      variant: form.variant.trim() || undefined,
-      year,
+      askingPrice: toOptionalNumber(form.askingPrice), description: form.description.trim(), email: form.email.trim() || undefined, location: form.location.trim() || undefined,
+      make: form.make.trim(), media: media.map((item, index) => ({ displayOrder: index + 1, storagePath: item.dataUrl })), mileage: toOptionalNumber(form.mileage),
+      model: form.model.trim(), phone: form.phone.trim(), sellerName: form.sellerName.trim(), variant: form.variant.trim() || undefined, year,
     });
   }
 
   return (
-    <div className="space-y-6 rounded-[28px] border border-border/60 bg-card/90 p-6 shadow-sm">
-      <div className="space-y-1">
-        <h2 className="text-xl font-semibold">{props.title}</h2>
-        <p className="text-sm text-muted-foreground">Make changes here, then save the upload back into the review queue.</p>
-      </div>
+    <div className="space-y-6">
+      <header className="space-y-2">
+        <h2 className="text-2xl font-semibold tracking-tight">{props.title}</h2>
+        <p className="text-sm text-muted-foreground">{t("description")}</p>
+      </header>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Section title={labels.contact}>
-          <Field label="Seller name"><Input value={form.sellerName} onChange={(event) => setForm((current) => ({ ...current, sellerName: event.target.value }))} /></Field>
-          <Field label="Phone"><Input value={form.phone} onChange={(event) => setForm((current) => ({ ...current, phone: event.target.value }))} /></Field>
-          <Field label="Email"><Input value={form.email} onChange={(event) => setForm((current) => ({ ...current, email: event.target.value }))} /></Field>
-        </Section>
+      <FormSection description={t("contactDescription")} title={t("contactTitle")}>
+        <div className="grid gap-4 md:grid-cols-2">
+          <Field label={t("sellerName")}><Input className={inputClassName} value={form.sellerName} onChange={(event) => setForm((current) => ({ ...current, sellerName: event.target.value }))} /></Field>
+          <Field label={t("phone")}><Input className={inputClassName} inputMode="tel" value={form.phone} onChange={(event) => setForm((current) => ({ ...current, phone: event.target.value }))} /></Field>
+          <Field className="md:col-span-2" label={t("email")}><Input className={inputClassName} inputMode="email" value={form.email} onChange={(event) => setForm((current) => ({ ...current, email: event.target.value }))} /></Field>
+        </div>
+      </FormSection>
 
-        <Section title={labels.details}>
-          <Field label="Make"><Input value={form.make} onChange={(event) => setForm((current) => ({ ...current, make: event.target.value }))} /></Field>
-          <Field label="Model"><Input value={form.model} onChange={(event) => setForm((current) => ({ ...current, model: event.target.value }))} /></Field>
-          <Field label="Year"><Input type="number" value={form.year} onChange={(event) => setForm((current) => ({ ...current, year: event.target.value }))} /></Field>
-          <Field label="Variant"><Input value={form.variant} onChange={(event) => setForm((current) => ({ ...current, variant: event.target.value }))} /></Field>
-          <Field label="Location"><Input value={form.location} onChange={(event) => setForm((current) => ({ ...current, location: event.target.value }))} /></Field>
-          <Field label="Mileage"><Input type="number" value={form.mileage} onChange={(event) => setForm((current) => ({ ...current, mileage: event.target.value }))} /></Field>
-          <Field label="Expected price"><Input type="number" value={form.askingPrice} onChange={(event) => setForm((current) => ({ ...current, askingPrice: event.target.value }))} /></Field>
-        </Section>
-      </div>
+      <FormSection description={t("vehicleDescription")} title={t("vehicleTitle")}>
+        <div className="grid gap-4 md:grid-cols-2">
+          <SearchableSelect emptyLabel={t("noMakes")} label={vehicleT("make")} options={getMakeOptions()} placeholder={t("pickMake")} searchPlaceholder={t("searchMake")} value={form.make} onValueChange={(value) => setForm((current) => ({ ...current, make: value, model: "", variant: "" }))} />
+          <SearchableSelect disabled={!form.make} emptyLabel={t("noModels")} label={vehicleT("model")} options={modelOptions} placeholder={t("pickModel")} searchPlaceholder={t("searchModel")} value={form.model} onValueChange={(value) => setForm((current) => ({ ...current, model: value, variant: "" }))} />
+          <Field label={vehicleT("year")}><Input className={inputClassName} inputMode="numeric" value={form.year} onChange={(event) => setForm((current) => ({ ...current, year: event.target.value }))} /></Field>
+          <SearchableSelect allowCustomValue disabled={!form.model} emptyLabel={t("noVariants")} label={vehicleT("variant")} options={variantOptions} placeholder={t("pickVariant")} searchPlaceholder={t("searchVariant")} value={form.variant} onValueChange={(value) => setForm((current) => ({ ...current, variant: value }))} />
+          <SearchableSelect allowCustomValue emptyLabel={t("noCities")} label={vehicleT("location")} options={getCityOptions()} placeholder={t("pickLocation")} searchPlaceholder={t("searchLocation")} value={form.location} onValueChange={(value) => setForm((current) => ({ ...current, location: value }))} />
+          <Field label={vehicleT("mileage")}><Input className={inputClassName} inputMode="numeric" value={form.mileage} onChange={(event) => setForm((current) => ({ ...current, mileage: event.target.value }))} /></Field>
+          <Field className="md:col-span-2" label={t("askingPrice")}><Input className={inputClassName} inputMode="numeric" value={form.askingPrice} onChange={(event) => setForm((current) => ({ ...current, askingPrice: event.target.value }))} /></Field>
+        </div>
+      </FormSection>
 
-      <Field label="Vehicle notes">
-        <Textarea rows={5} value={form.description} onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))} />
-      </Field>
+      <FormSection description={t("notesDescription")} title={t("notesTitle")}>
+        <Field label={t("vehicleNotes")}><Textarea className={textareaClassName} value={form.description} onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))} /></Field>
+      </FormSection>
 
-      <PhotoUploadField value={media} onChange={setMedia} />
+      <FormSection description={t("mediaDescription")} title={t("mediaTitle")}><PhotoUploadField value={media} onChange={setMedia} /></FormSection>
 
-      <div className="flex flex-wrap gap-3">
-        <Button disabled={props.isPending} type="button" onClick={handleSubmit}>
-          {props.submitLabel}
-        </Button>
-        {props.onCancel ? (
-          <Button disabled={props.isPending} type="button" variant="outline" onClick={props.onCancel}>
-            Cancel
-          </Button>
-        ) : null}
-      </div>
+      <StickyFormFooter>
+        <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
+          {props.onCancel ? <Button className="rounded-2xl" disabled={props.isPending} type="button" variant="outline" onClick={props.onCancel}>{t("cancel")}</Button> : null}
+          <Button className="rounded-2xl" disabled={props.isPending} type="button" onClick={handleSubmit}>{props.isPending ? t("saving") : props.submitLabel}</Button>
+        </div>
+      </StickyFormFooter>
     </div>
   );
 }
 
-function Field({ children, label }: { children: React.ReactNode; label: string }) {
-  return (
-    <div className="space-y-2">
-      <Label>{label}</Label>
-      {children}
-    </div>
-  );
-}
-
-function Section({ children, title }: { children: React.ReactNode; title: string }) {
-  return (
-    <div className="space-y-4">
-      <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground">{title}</h3>
-      <div className="grid gap-4 sm:grid-cols-2">{children}</div>
-    </div>
-  );
+function Field({ children, className, label }: { children: ReactNode; className?: string; label: string }) {
+  return <div className={className ? className : ""}><Label className="mb-2 block">{label}</Label>{children}</div>;
 }

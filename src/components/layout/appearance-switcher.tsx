@@ -56,11 +56,11 @@ export function AppearanceSwitcher() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button aria-label={t("title")} className="rounded-2xl" size="icon" type="button" variant="ghost">
+        <Button aria-label={t("title")} className="shell-control rounded-2xl" size="icon" type="button" variant="outline">
           <Palette className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-64 rounded-2xl p-2">
+      <DropdownMenuContent align="end" className="sheet-surface w-64 rounded-2xl p-2">
         <DropdownMenuLabel>{t("title")}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuLabel className="text-xs uppercase tracking-[0.18em] text-muted-foreground">{t("mode")}</DropdownMenuLabel>

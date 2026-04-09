@@ -155,7 +155,8 @@
   }
 
   .glass-surface {
-    background: rgba(255, 255, 255, 0.72);
+    background: hsl(var(--card) / 0.72);
+    border: 1px solid hsl(var(--border) / 0.52);
     backdrop-filter: blur(18px);
   }
 
@@ -170,5 +171,29 @@
     background: hsl(var(--card) / 0.8);
     border-color: hsl(var(--border) / 0.72);
     backdrop-filter: blur(20px);
+  }
+
+  .shell-control {
+    background: hsl(var(--card) / 0.72);
+    border: 1px solid hsl(var(--border) / 0.68);
+    backdrop-filter: blur(16px);
+  }
+
+  .sheet-surface {
+    background:
+      linear-gradient(180deg, hsl(var(--card)) 0%, hsl(var(--card) / 0.94) 100%);
+    backdrop-filter: blur(20px);
+  }
+
+  .section-surface {
+    background: hsl(var(--card) / 0.9);
+    border: 1px solid hsl(var(--border) / 0.72);
+    backdrop-filter: blur(14px);
+  }
+
+  .sticky-form-footer {
+    background:
+      linear-gradient(180deg, hsl(var(--background) / 0.78) 0%, hsl(var(--background) / 0.96) 38%);
+    backdrop-filter: blur(18px);
   }
 }
