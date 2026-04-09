@@ -1,7 +1,9 @@
 "use client";
 
+const portalPath = process.env.NEXT_PUBLIC_SUPABASE_URL ? "/api/portal" : "/api/demo/portal";
+
 async function requestPortal(method: "PATCH" | "POST", action: string, payload: object) {
-  const response = await fetch("/api/demo/portal", {
+  const response = await fetch(portalPath, {
     method,
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ action, payload }),

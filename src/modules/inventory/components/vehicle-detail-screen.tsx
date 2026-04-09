@@ -36,7 +36,7 @@ interface VehicleDetailScreenProps {
     documentationCost?: number;
     transportCost?: number;
     otherCost?: number;
-    media: Array<{ storagePath: string }>;
+    media: Array<{ previewUrl?: string; storagePath: string }>;
   };
   showFinancials: boolean;
 }
@@ -116,7 +116,7 @@ export function VehicleDetailScreen({ record, showFinancials }: VehicleDetailScr
       <div className="grid gap-8 xl:grid-cols-[1.35fr_0.95fr]">
         <div className="space-y-5">
           <div className="relative aspect-[4/3] overflow-hidden rounded-[28px] border border-border/60 bg-muted shadow-[0_24px_80px_rgba(15,23,42,0.08)]">
-            <Image alt={`${record.make} ${record.model}`} fill src={record.media[0]?.storagePath ?? "/placeholder-car.svg"} className="object-cover" />
+            <Image alt={`${record.make} ${record.model}`} fill src={record.media[0]?.previewUrl ?? record.media[0]?.storagePath ?? "/placeholder-car.svg"} className="object-cover" unoptimized />
           </div>
           <Card className="border-border/60 bg-card/90 shadow-sm">
             <CardHeader>

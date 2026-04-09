@@ -143,3 +143,50 @@ Execution order:
 If continuing in a fresh session, the best opening instruction is:
 
 `Continue from the remaining production track in HANDOFF.md: audit the remaining admin/mobile gaps, then start Supabase-backed persistence and private media delivery without reopening the completed mobile form and shell pass.`
+
+## 2026-04-09 Latest Update
+
+- Supabase is now the primary read and write path in code for the active portal when it is configured.
+- Real route handlers exist for:
+  - `/api/portal`
+  - `/api/vehicles`
+  - `/api/vehicles/[listingId]`
+  - `/api/inquiries`
+  - `/api/reservations`
+  - `/api/resale`
+  - `/api/chat/messages`
+- Inventory reads, dashboard reads, requests, support queues, chat reads, profile reads, and shell notifications now go through the Supabase wrapper layer in `src/lib/portal/*`.
+- Vehicle create, edit, and delete now target the real inventory routes when `NEXT_PUBLIC_SUPABASE_URL` is present.
+- Private vehicle images and voice notes now resolve through signed URLs or private storage uploads on the server path.
+- Existing Supabase auth users get a `user_profiles` row automatically on read if one is missing.
+- `SUPABASE_ADMIN_EMAIL` can auto-promote the configured account to approved admin on first read.
+
+What still must happen before this works against your real project:
+
+- Apply migrations:
+  - `20260408_001_initial_schema.sql`
+  - `20260408_002_rls_policies.sql`
+  - `20260408_003_storage_buckets.sql`
+  - `20260408_004_seed_data.sql`
+  - `20260408_005_security_and_chat_fixes.sql`
+  - `20260409_001_portal_primary_extensions.sql`
+- Ensure env vars exist locally:
+  - `NEXT_PUBLIC_SUPABASE_URL`
+  - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+  - `SUPABASE_SERVICE_ROLE_KEY`
+  - `SUPABASE_ADMIN_EMAIL=Junaid557722@gmail.com`
+
+Known remaining gaps after this pass:
+
+- Seller submissions are still demo-backed, though converting a submission now creates a Supabase listing.
+- Plate blur is still deferred.
+- PWA readiness and APK or IPA packaging work have not started.
+- `docs/APP_STRUCTURE.md` is still stale.
+- Repo cleanup noise still exists: `.server-5000.*` and `nul`.
+
+Verification status for the current workspace:
+
+- `typecheck`: passed
+- `lint`: passed
+- `test`: passed
+- `build`: passed

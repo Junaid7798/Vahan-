@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { requireViewer } from "@/lib/auth/viewer";
-import { getVehicleRecord } from "@/lib/demo/portal-catalog";
+import { getVehicleRecord } from "@/lib/portal/catalog";
 import { VehicleDetailScreen } from "@/modules/inventory/components/vehicle-detail-screen";
 
 export default async function VehicleDetailPage({
@@ -10,7 +10,7 @@ export default async function VehicleDetailPage({
 }) {
   const { locale, listingId } = await params;
   const viewer = await requireViewer(locale);
-  const record = await getVehicleRecord(listingId);
+  const record = await getVehicleRecord(listingId, viewer.permissions.canViewFinancials);
 
   if (!record) {
     notFound();

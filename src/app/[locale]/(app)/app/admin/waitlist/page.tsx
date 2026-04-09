@@ -1,6 +1,6 @@
 import { WaitlistPanel } from "@/modules/admin/components/waitlist-panel";
 import { requireStaff } from "@/lib/auth/viewer";
-import { getSupportData } from "@/lib/demo/portal-operations";
+import { getSupportData } from "@/lib/portal/operations";
 
 export default async function WaitlistPage({
   params,

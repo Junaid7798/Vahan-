@@ -1,7 +1,7 @@
 ﻿import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/routing";
 import { requireViewer } from "@/lib/auth/viewer";
-import { getDashboardData } from "@/lib/demo/portal-operations";
+import { getDashboardData } from "@/lib/portal/operations";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 

@@ -1,6 +1,6 @@
 ﻿import { getTranslations } from "next-intl/server";
 import { requireViewer } from "@/lib/auth/viewer";
-import { getVehicleCatalog } from "@/lib/demo/portal-catalog";
+import { getVehicleCatalog } from "@/lib/portal/catalog";
 import { InventoryScreen } from "@/modules/inventory/components/inventory-screen";
 
 export default async function InventoryPage({
@@ -11,7 +11,7 @@ export default async function InventoryPage({
   const { locale } = await params;
   const inventoryT = await getTranslations({ locale, namespace: "inventory" });
   const viewer = await requireViewer(locale);
-  const catalog = await getVehicleCatalog(["published"]);
+  const catalog = await getVehicleCatalog(["published"], viewer.permissions.canViewFinancials);
 
   return (
     <InventoryScreen

@@ -29,7 +29,8 @@ export function VehicleManagementTable({ locale, rows }: VehicleManagementTableP
   function deleteVehicle(listingId: string) {
     startTransition(async () => {
       try {
-        const response = await fetch(`/api/demo/vehicles/${listingId}`, { method: "DELETE" });
+        const basePath = process.env.NEXT_PUBLIC_SUPABASE_URL ? "/api/vehicles" : "/api/demo/vehicles";
+        const response = await fetch(`${basePath}/${listingId}`, { method: "DELETE" });
         if (!response.ok) {
           const payload = (await response.json().catch(() => ({}))) as { error?: string };
           throw new Error(payload.error ?? "The vehicle could not be deleted.");

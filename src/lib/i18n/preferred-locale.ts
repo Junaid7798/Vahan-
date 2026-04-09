@@ -1,7 +1,8 @@
 import { cookies, headers } from "next/headers";
-import { getAuthenticatedUser } from "@/lib/auth/session";
+import { getAuthenticatedUser, isSupabaseConfigured } from "@/lib/auth/session";
 import { getDemoUserByEmail } from "@/lib/demo/portal-users";
 import { PortalLocale } from "@/lib/demo/portal-types";
+import { createServerClient } from "@/lib/supabase/server-client";
 
 const supportedLocales: PortalLocale[] = ["en", "hi"];
 
@@ -26,6 +27,19 @@ export async function getPreferredLocale(): Promise<PortalLocale> {
   }
 
   const user = await getAuthenticatedUser();
+  if (user && isSupabaseConfigured()) {
+    const supabase = await createServerClient();
+    const { data: profile } = await supabase
+      .from("user_profiles")
+      .select("preferred_locale")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (isSupportedLocale(profile?.preferred_locale)) {
+      return profile.preferred_locale;
+    }
+  }
+
   if (user?.isDemo && user.email) {
     const account = await getDemoUserByEmail(user.email);
     if (account?.preferredLocale) {

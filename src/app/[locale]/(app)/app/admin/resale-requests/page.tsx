@@ -1,6 +1,6 @@
 import { ResaleRequestsPanel } from "@/modules/admin/components/resale-requests-panel";
 import { requireStaff } from "@/lib/auth/viewer";
-import { getSupportData } from "@/lib/demo/portal-operations";
+import { getSupportData } from "@/lib/portal/operations";
 
 export default async function ResaleRequestsPage({
   params,

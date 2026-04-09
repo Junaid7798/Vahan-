@@ -3,6 +3,7 @@ export interface CompressedImageResult {
   dataUrl: string;
   fileName: string;
   originalSize: number;
+  storagePath?: string;
 }
 
 async function readAsDataUrl(blob: Blob) {

@@ -42,7 +42,13 @@ function toFormState(defaultSeller: VehicleSubmissionFormProps["defaultSeller"],
 }
 
 function toMediaState(record?: SellerSubmissionRecord | null): CompressedImageResult[] {
-  return (record?.media ?? []).map((item) => ({ compressedSize: 0, dataUrl: item.storagePath, fileName: item.id, originalSize: 0 }));
+  return (record?.media ?? []).map((item) => ({
+    compressedSize: 0,
+    dataUrl: item.previewUrl ?? item.storagePath,
+    fileName: item.id,
+    originalSize: 0,
+    storagePath: item.storagePath,
+  }));
 }
 
 function toOptionalNumber(value: string) {
@@ -71,7 +77,7 @@ export function VehicleSubmissionForm(props: VehicleSubmissionFormProps) {
 
     await props.onSubmit({
       askingPrice: toOptionalNumber(form.askingPrice), description: form.description.trim(), email: form.email.trim() || undefined, location: form.location.trim() || undefined,
-      make: form.make.trim(), media: media.map((item, index) => ({ displayOrder: index + 1, storagePath: item.dataUrl })), mileage: toOptionalNumber(form.mileage),
+      make: form.make.trim(), media: media.map((item, index) => ({ displayOrder: index + 1, storagePath: item.storagePath ?? item.dataUrl })), mileage: toOptionalNumber(form.mileage),
       model: form.model.trim(), phone: form.phone.trim(), sellerName: form.sellerName.trim(), variant: form.variant.trim() || undefined, year,
     });
   }

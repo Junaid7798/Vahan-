@@ -55,7 +55,7 @@ const statusColors: Record<string, string> = {
 
 function formatImageSrc(path?: string): string {
   if (!path) return "/placeholder-car.svg";
-  if (path.startsWith("http://") || path.startsWith("https://") || path.startsWith("/")) {
+  if (path.startsWith("data:") || path.startsWith("http://") || path.startsWith("https://") || path.startsWith("/")) {
     return path;
   }
   return `/${path}`;
@@ -132,7 +132,7 @@ export function VehicleCard({
   return (
     <Card className="overflow-hidden rounded-[28px] border border-border/60 bg-card/90 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-[0_20px_60px_rgba(15,23,42,0.08)]">
       <div className="relative aspect-video bg-muted">
-        <Image src={imageUrl} alt={`${vehicle.make} ${vehicle.model}`} fill sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw" className={`object-cover ${isBlurred ? "blur-md" : ""}`} />
+        <Image src={imageUrl} alt={`${vehicle.make} ${vehicle.model}`} fill sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw" className={`object-cover ${isBlurred ? "blur-md" : ""}`} unoptimized />
         {listing?.status ? <Badge className={`absolute left-3 top-3 ${statusColors[listing.status] ?? statusColors.draft} text-white`}>{formatStatus(listing.status)}</Badge> : null}
         <div className="absolute right-3 top-3 flex gap-2">
           <Button type="button" variant="secondary" size="icon" className="h-9 w-9 rounded-full" aria-label={inventoryT("saveVehicle")} onClick={toggleSaved}>

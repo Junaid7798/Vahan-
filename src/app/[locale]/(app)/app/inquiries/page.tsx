@@ -1,6 +1,6 @@
 import { InquiriesPanel } from "@/modules/admin/components/inquiries-panel";
 import { requireViewer } from "@/lib/auth/viewer";
-import { getInquiriesForViewer } from "@/lib/demo/portal-operations";
+import { getInquiriesForViewer } from "@/lib/portal/operations";
 
 export default async function InquiriesPage({
   params,

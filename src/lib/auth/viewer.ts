@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { getAuthenticatedUser, isSupabaseConfigured } from "@/lib/auth/session";
 import { demoUsers } from "@/lib/demo/portal-seed";
 import { getDemoUserByEmail } from "@/lib/demo/portal-users";
+import { createAdminClient } from "@/lib/supabase/admin-client";
 import { createServerClient } from "@/lib/supabase/server-client";
 import { getPermissions, PermissionCheck, UserProfile } from "@/lib/supabase/permissions";
 
@@ -56,11 +57,38 @@ export async function getViewerContext(): Promise<ViewerContext | null> {
   }
 
   const supabase = await createServerClient();
-  const { data: profile } = await supabase
-    .from("user_profiles")
-    .select("*")
-    .eq("id", user.id)
-    .maybeSingle();
+  const {
+    data: { user: authUser },
+  } = await supabase.auth.getUser();
+
+  let { data: profile } = await supabase.from("user_profiles").select("*").eq("id", user.id).maybeSingle();
+
+  const adminEmail = process.env.SUPABASE_ADMIN_EMAIL?.toLowerCase();
+  const shouldPromoteToAdmin = Boolean(user.email && adminEmail && user.email.toLowerCase() === adminEmail);
+
+  if (!profile || shouldPromoteToAdmin) {
+    try {
+      const adminClient = createAdminClient();
+      const payload = {
+        id: user.id,
+        full_name: authUser?.user_metadata.full_name ?? user.email ?? user.id,
+        phone: authUser?.user_metadata.phone ?? null,
+        city: authUser?.user_metadata.city ?? null,
+        preferred_locale: authUser?.user_metadata.preferred_locale === "hi" ? "hi" : "en",
+        role: shouldPromoteToAdmin ? "admin" : profile?.role ?? "user",
+        approval_status: shouldPromoteToAdmin ? "approved" : profile?.approval_status ?? "pending_approval",
+        can_view_financials: shouldPromoteToAdmin ? true : profile?.can_view_financials ?? false,
+      };
+
+      await adminClient.from("user_profiles").upsert(payload, { onConflict: "id" });
+      const result = await adminClient.from("user_profiles").select("*").eq("id", user.id).maybeSingle();
+      profile = result.data ?? profile;
+    } catch {
+      if (!profile) {
+        return null;
+      }
+    }
+  }
 
   if (!profile) {
     return null;

@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { AppSidebar } from "@/components/layout/app-sidebar";
 import { AppTopbar } from "@/components/layout/app-topbar";
 import { requireViewer } from "@/lib/auth/viewer";
-import { getShellNotifications } from "@/lib/demo/portal-operations";
+import { getShellNotifications } from "@/lib/portal/operations";
 
 function getInitials(name: string | null, email: string | null): string {
   const source = name ?? email ?? "User";

@@ -1,6 +1,6 @@
 import { Link } from "@/i18n/routing";
 import { requireStaff } from "@/lib/auth/viewer";
-import { getVehicleCatalog } from "@/lib/demo/portal-catalog";
+import { getVehicleCatalog } from "@/lib/portal/catalog";
 import { VehicleManagementTable } from "@/modules/admin/components/vehicle-management-table";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,8 +11,8 @@ export default async function AdminVehiclesPage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  await requireStaff(locale);
-  const catalog = await getVehicleCatalog();
+  const viewer = await requireStaff(locale);
+  const catalog = await getVehicleCatalog(undefined, viewer.permissions.canViewFinancials);
 
   return (
     <Card>

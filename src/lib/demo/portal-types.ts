@@ -27,6 +27,7 @@ export interface DemoUserAccount {
 export interface VehicleMediaRecord {
   id: string;
   storagePath: string;
+  previewUrl?: string;
   mediaType: "image";
   isBlurred: boolean;
   displayOrder: number;

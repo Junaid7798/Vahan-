@@ -1,6 +1,6 @@
 import { UsersManagementPanel } from "@/modules/admin/components/users-management-panel";
 import { requireAdmin } from "@/lib/auth/viewer";
-import { getSupportData } from "@/lib/demo/portal-operations";
+import { getSupportData } from "@/lib/portal/operations";
 
 export default async function UsersPage({
   params,

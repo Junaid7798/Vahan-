@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { requireViewer } from "@/lib/auth/viewer";
-import { getRequestsForViewer } from "@/lib/demo/portal-operations";
+import { getRequestsForViewer } from "@/lib/portal/operations";
 import { MySubmissionsPanel } from "@/modules/requests/components/my-submissions-panel";
 
 export default async function MyRequestsPage({

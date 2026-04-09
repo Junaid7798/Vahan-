@@ -6,6 +6,7 @@ export interface UserProfile {
   full_name: string | null;
   phone: string | null;
   city: string | null;
+  preferred_locale?: "en" | "hi" | null;
   role: UserRole;
   approval_status: ApprovalStatus;
   can_view_financials: boolean;

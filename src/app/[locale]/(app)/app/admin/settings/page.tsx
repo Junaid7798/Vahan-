@@ -1,7 +1,7 @@
 ﻿import { getTranslations } from "next-intl/server";
 import { AdminSettingsForm } from "@/modules/admin/components/settings-form";
 import { requireAdmin } from "@/lib/auth/viewer";
-import { getSupportData } from "@/lib/demo/portal-operations";
+import { getSupportData } from "@/lib/portal/operations";
 
 export default async function SettingsPage({
   params,

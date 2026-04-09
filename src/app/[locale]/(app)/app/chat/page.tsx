@@ -1,5 +1,5 @@
 import { requireViewer } from "@/lib/auth/viewer";
-import { getChatForViewer } from "@/lib/demo/portal-operations";
+import { getChatForViewer } from "@/lib/portal/operations";
 import { ChatWorkspace } from "@/modules/chat/components/chat-workspace";
 
 export default async function ChatPage({
