@@ -49,24 +49,16 @@ Continue the private used-vehicle portal as a mobile-first bilingual app with Su
 
 ### Next Steps
 
-1. Apply the full Supabase migration chain in the real project, including:
-   - `20260408_001_initial_schema.sql`
-   - `20260408_002_rls_policies.sql`
-   - `20260408_003_storage_buckets.sql`
-   - `20260408_004_seed_data.sql`
-   - `20260408_005_security_and_chat_fixes.sql`
-   - `20260409_001_portal_primary_extensions.sql`
-   - `20260410_001_reservation_guardrails.sql`
-   - `20260411_001_seller_submission_upgrade.sql`
+1. Validate live Supabase flows with admin, manager, and user test accounts once the env vars and credentials are available in the local shell or another accessible validation environment.
 2. Finish the lower-priority admin localization pass.
 3. Add offline E2E coverage plus a visible queued-action history or retry surface.
-4. Decide and validate the actual packaging route from `docs/PWA_READINESS.md`.
-5. Add a legacy-image blur backfill job if old inventory needs user-facing coverage without manual re-save.
-6. Delete local noise files only if explicitly approved: `.server-5000.*` and `nul`.
+4. Add a legacy-image blur backfill job if old inventory needs user-facing coverage without manual re-save.
+5. Delete local noise files only if explicitly approved: `.server-5000.*` and `nul`.
 
 ### External Follow-up Required
 
-- Real Supabase migration apply and environment validation still require your actual project access.
+- User reported that the real Supabase migrations have been applied, including `20260411_001_seller_submission_upgrade.sql`.
+- Live Supabase validation is still blocked in this local shell because the Supabase env vars and admin, manager, and user test credentials are not available here.
 - Packaged-shell validation for Android or iOS has not been run.
 - Destructive cleanup of local noise files was intentionally not performed without explicit approval.
 
@@ -79,7 +71,7 @@ Continue the private used-vehicle portal as a mobile-first bilingual app with Su
 
 ### Practical Restart Prompt
 
-`Continue from HANDOFF.md current snapshot: apply the real Supabase migrations, then finish offline E2E coverage and the remaining admin localization cleanup without reopening the completed auth, plate-blur, seller-submission, or queue wiring work.`
+`Continue from HANDOFF.md current snapshot: validate live Supabase flows with admin, manager, and user accounts once env vars and credentials are available, then finish offline E2E coverage and the remaining admin localization cleanup without reopening the completed auth, plate-blur, seller-submission, or queue wiring work.`
 
 ## Archived Older Notes
 
