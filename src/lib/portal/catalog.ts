@@ -2,7 +2,7 @@ import { getVehicleCatalog as getDemoVehicleCatalog, getVehicleRecord as getDemo
 import { isSupabaseConfigured } from "@/lib/auth/session";
 import { getVehicleCatalog as getSupabaseVehicleCatalog, getVehicleRecord as getSupabaseVehicleRecord } from "@/lib/supabase/portal-catalog";
 
-export async function getVehicleCatalog(statuses?: string[], showFinancials = false) {
+export async function getVehicleCatalog(statuses?: string[], showFinancials = false, canViewOriginalMedia = false) {
   if (!isSupabaseConfigured()) {
     const catalog = await getDemoVehicleCatalog(statuses);
     return {
@@ -14,10 +14,10 @@ export async function getVehicleCatalog(statuses?: string[], showFinancials = fa
     };
   }
 
-  return getSupabaseVehicleCatalog(statuses, showFinancials);
+  return getSupabaseVehicleCatalog(statuses, showFinancials, canViewOriginalMedia);
 }
 
-export async function getVehicleRecord(listingId: string, showFinancials = false) {
+export async function getVehicleRecord(listingId: string, showFinancials = false, canViewOriginalMedia = false) {
   if (!isSupabaseConfigured()) {
     const record = await getDemoVehicleRecord(listingId);
     if (!record || showFinancials) {
@@ -38,7 +38,7 @@ export async function getVehicleRecord(listingId: string, showFinancials = false
     };
   }
 
-  return getSupabaseVehicleRecord(listingId, showFinancials);
+  return getSupabaseVehicleRecord(listingId, showFinancials, canViewOriginalMedia);
 }
 
 export { getStatusLabel, sumVehicleCosts };

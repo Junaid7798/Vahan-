@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
+import { readResponseJson } from "@/modules/auth/lib/read-response-json";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -44,10 +45,10 @@ export function LoginForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
-      const result = await response.json();
+      const result = await readResponseJson<{ error?: string }>(response);
 
       if (!response.ok) {
-        setError(result.error || authT("invalidCredentials"));
+        setError(result?.error || authT("invalidCredentials"));
         return;
       }
 

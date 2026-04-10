@@ -9,6 +9,7 @@ import { Link, useRouter } from "@/i18n/routing";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { readResponseJson } from "@/modules/auth/lib/read-response-json";
 import {
   Card,
   CardContent,
@@ -65,10 +66,10 @@ export function SignupForm() {
         body: JSON.stringify(data),
       });
 
-      const result = await response.json();
+      const result = await readResponseJson<{ error?: string }>(response);
 
       if (!response.ok) {
-        setError(result.error || commonT("error"));
+        setError(result?.error || commonT("error"));
         return;
       }
 

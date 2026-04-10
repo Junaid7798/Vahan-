@@ -1,12 +1,16 @@
 "use client";
 
+import { useEffect } from "react";
 import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 import { useTranslations } from "next-intl";
 import { WifiOff } from "lucide-react";
+import { setupAutoSync } from "@/lib/offline/sync";
 
 export function OnlineStatusIndicator() {
   const isOnline = useOnlineStatus();
   const t = useTranslations("offline");
+
+  useEffect(() => setupAutoSync(), []);
 
   if (isOnline) return null;
 

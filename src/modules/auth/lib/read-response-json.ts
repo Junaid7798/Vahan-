@@ -1,0 +1,13 @@
+export async function readResponseJson<T>(response: Response): Promise<T | null> {
+  const body = await response.text();
+
+  if (!body) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(body) as T;
+  } catch {
+    return null;
+  }
+}

@@ -11,7 +11,11 @@ export default async function SoldPage({
   const { locale } = await params;
   const inventoryT = await getTranslations({ locale, namespace: "inventory" });
   const viewer = await requireViewer(locale);
-  const catalog = await getVehicleCatalog(["sold"], viewer.permissions.canViewFinancials);
+  const catalog = await getVehicleCatalog(
+    ["sold"],
+    viewer.permissions.canViewFinancials,
+    viewer.permissions.canManageVehicles,
+  );
 
   return (
     <InventoryScreen

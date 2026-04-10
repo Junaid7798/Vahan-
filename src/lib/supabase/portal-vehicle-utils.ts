@@ -1,5 +1,7 @@
 import "server-only";
 
+import { MediaInput } from "@/lib/supabase/vehicle-media-variants";
+
 export interface VehiclePayload {
   bodyType?: string;
   color?: string;
@@ -12,7 +14,7 @@ export interface VehiclePayload {
   location?: string;
   maintenanceCost?: number;
   make: string;
-  media?: Array<{ displayOrder: number; storagePath: string }>;
+  media?: MediaInput[];
   mileage?: number;
   model: string;
   otherCost?: number;
@@ -61,25 +63,4 @@ export function buildListingPatch(payload: VehiclePayload, current?: { published
     target_selling_price: payload.targetSellingPrice ?? null,
     transport_cost: payload.transportCost ?? null,
   };
-}
-
-export function buildVehicleMediaRows(
-  listingId: string,
-  media: Array<{ displayOrder: number; storagePath: string }>
-) {
-  return media.map((item) => ({
-    display_order: item.displayOrder,
-    is_blurred: false,
-    listing_id: listingId,
-    media_type: "image",
-    storage_path: item.storagePath,
-  }));
-}
-
-export function getNewStoragePaths(
-  inputMedia: Array<{ displayOrder: number; storagePath: string }>,
-  persistedMedia: Array<{ displayOrder: number; storagePath: string }>
-) {
-  const originalPaths = new Set(inputMedia.map((item) => item.storagePath));
-  return persistedMedia.map((item) => item.storagePath).filter((path) => !originalPaths.has(path));
 }

@@ -4,6 +4,7 @@ import { VehicleRecord } from "@/lib/demo/portal-types";
 import { createAdminClient } from "@/lib/supabase/admin-client";
 import { resolveStorageUrl } from "@/lib/supabase/portal-media";
 import { PortalCatalogResult } from "@/lib/supabase/portal-types";
+import { selectVehicleMediaVariants } from "@/lib/supabase/vehicle-media-variants";
 
 type ListingRow = {
   condition_notes?: string | null;
@@ -111,23 +112,23 @@ async function fetchListingRows(statuses?: string[]) {
   return (data ?? []) as unknown as ListingRow[];
 }
 
-async function toVehicleRecord(row: ListingRow): Promise<VehicleRecord> {
+async function toVehicleRecord(row: ListingRow, canViewOriginalMedia: boolean): Promise<VehicleRecord> {
   const vehicle = Array.isArray(row.vehicles) ? row.vehicles[0] : null;
   if (!vehicle) {
     throw new Error(`Vehicle row missing for listing ${row.id}.`);
   }
 
   const media = await Promise.all(
-    (row.vehicle_media ?? [])
-      .sort((left, right) => (left.display_order ?? 0) - (right.display_order ?? 0))
-      .map(async (item) => ({
-        id: item.id,
-        storagePath: item.storage_path,
-        previewUrl: (await resolveStorageUrl("vehicle-images", item.storage_path)) ?? undefined,
-        mediaType: "image" as const,
-        isBlurred: Boolean(item.is_blurred),
-        displayOrder: item.display_order ?? 0,
-      }))
+    selectVehicleMediaVariants(row.vehicle_media ?? [], canViewOriginalMedia).map(async (item) => ({
+      blurredStoragePath: item.blurredStoragePath,
+      displayOrder: item.displayOrder,
+      id: item.id,
+      isBlurred: Boolean(item.isBlurred),
+      mediaType: "image" as const,
+      originalStoragePath: item.originalStoragePath,
+      previewUrl: (await resolveStorageUrl("vehicle-images", item.storagePath)) ?? undefined,
+      storagePath: item.storagePath,
+    }))
   );
 
   return {
@@ -166,7 +167,9 @@ async function toVehicleRecord(row: ListingRow): Promise<VehicleRecord> {
           {
             id: `placeholder-${row.id}`,
             storagePath: "/placeholder-car.svg",
+            originalStoragePath: "/placeholder-car.svg",
             previewUrl: "/placeholder-car.svg",
+            blurredStoragePath: "/placeholder-car.svg",
             mediaType: "image",
             isBlurred: false,
             displayOrder: 1,
@@ -211,13 +214,13 @@ function toCatalog(records: VehicleRecord[], showFinancials: boolean): PortalCat
   };
 }
 
-export async function getVehicleCatalog(statuses?: string[], showFinancials = false) {
+export async function getVehicleCatalog(statuses?: string[], showFinancials = false, canViewOriginalMedia = false) {
   const rows = await fetchListingRows(statuses);
-  const records = await Promise.all(rows.map(toVehicleRecord));
+  const records = await Promise.all(rows.map((row) => toVehicleRecord(row, canViewOriginalMedia)));
   return toCatalog(records, showFinancials);
 }
 
-export async function getVehicleRecord(listingId: string, showFinancials = false) {
+export async function getVehicleRecord(listingId: string, showFinancials = false, canViewOriginalMedia = false) {
   const rows = await fetchListingRows();
   const row = rows.find((item) => item.id === listingId);
 
@@ -225,7 +228,7 @@ export async function getVehicleRecord(listingId: string, showFinancials = false
     return null;
   }
 
-  const record = await toVehicleRecord(row);
+  const record = await toVehicleRecord(row, canViewOriginalMedia);
 
   if (showFinancials) {
     return record;

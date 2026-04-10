@@ -11,6 +11,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { readResponseJson } from "@/modules/auth/lib/read-response-json";
 
 const forgotPasswordSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -41,10 +42,10 @@ export function ForgotPasswordForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...data, locale }),
       });
-      const result = (await response.json()) as { error?: string };
+      const result = await readResponseJson<{ error?: string }>(response);
 
       if (!response.ok) {
-        setServerError(result.error ?? commonT("error"));
+        setServerError(result?.error ?? commonT("error"));
         return;
       }
 

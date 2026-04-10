@@ -12,7 +12,11 @@ export default async function AdminVehiclesPage({
 }) {
   const { locale } = await params;
   const viewer = await requireStaff(locale);
-  const catalog = await getVehicleCatalog(undefined, viewer.permissions.canViewFinancials);
+  const catalog = await getVehicleCatalog(
+    undefined,
+    viewer.permissions.canViewFinancials,
+    viewer.permissions.canManageVehicles,
+  );
 
   return (
     <Card>

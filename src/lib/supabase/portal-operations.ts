@@ -1,12 +1,12 @@
 import "server-only";
 
-import { readPortalStore } from "@/lib/demo/portal-store";
 import { DemoPortalSettings } from "@/lib/demo/portal-types";
 import { PermissionCheck } from "@/lib/supabase/permissions";
 import { createAdminClient } from "@/lib/supabase/admin-client";
 import { getVehicleCatalog, getVehicleRecord } from "@/lib/supabase/portal-catalog";
 import { PortalNotificationItem } from "@/lib/supabase/portal-types";
 import { resolveStorageUrl } from "@/lib/supabase/portal-media";
+import { getSellerSubmissions } from "@/lib/supabase/portal-submission-records";
 
 function getVehicleTitle(listingId: string, titles: Map<string, string>) {
   return titles.get(listingId) ?? listingId;
@@ -67,11 +67,11 @@ async function getProfilesMap() {
 
 export async function getDashboardData(userId: string, permissions: PermissionCheck) {
   const client = createAdminClient();
-  const [catalog, vehicleTitles, profilesMap, demoState] = await Promise.all([
+  const [catalog, vehicleTitles, profilesMap, submissions] = await Promise.all([
     getVehicleCatalog(),
     getVehicleTitles(),
     getProfilesMap(),
-    readPortalStore(),
+    permissions.canManageVehicles ? getSellerSubmissions() : Promise.resolve([]),
   ]);
 
   const available = catalog.records.filter((record) => record.status === "published");
@@ -96,7 +96,7 @@ export async function getDashboardData(userId: string, permissions: PermissionCh
         { label: "Sold Listings", value: sold.length.toString() },
         { label: "Pending Approvals", value: Array.from(profilesMap.values()).filter((item) => item.approval_status === "pending_approval").length.toString() },
         { label: "Reservation Requests", value: (reservations ?? []).filter((item) => item.status === "pending").length.toString() },
-        { label: "Seller Submissions", value: demoState.submissions.filter((item) => item.status === "pending").length.toString() },
+        { label: "Seller Submissions", value: submissions.filter((item) => item.status === "pending").length.toString() },
         { label: "Resale Requests", value: (resales ?? []).filter((item) => item.status === "pending").length.toString() },
       ],
       queues: {
@@ -111,7 +111,7 @@ export async function getDashboardData(userId: string, permissions: PermissionCh
         inquiries: (inquiries ?? []).filter((item) => item.status === "open"),
         reservations: (reservations ?? []).filter((item) => item.status === "pending"),
         resales: (resales ?? []).filter((item) => item.status === "pending"),
-        submissions: demoState.submissions.filter((item) => item.status === "pending"),
+        submissions: submissions.filter((item) => item.status === "pending"),
       },
       records: catalog.records,
       vehicleTitles,
@@ -167,9 +167,9 @@ export async function getInquiriesForViewer(userId: string, canViewAll: boolean)
 
 export async function getRequestsForViewer(userId: string) {
   const client = createAdminClient();
-  const [vehicleTitles, demoState, reservations, resales, waitlist] = await Promise.all([
+  const [vehicleTitles, submissions, reservations, resales, waitlist] = await Promise.all([
     getVehicleTitles(),
-    readPortalStore(),
+    getSellerSubmissions(userId),
     client.from("reservation_requests").select("*").eq("user_id", userId).order("created_at", { ascending: false }),
     client.from("resale_requests").select("*").eq("user_id", userId).order("created_at", { ascending: false }),
     client.from("reservation_waitlist").select("*").eq("user_id", userId).order("created_at", { ascending: false }),
@@ -188,8 +188,7 @@ export async function getRequestsForViewer(userId: string) {
       status: item.status,
       createdAt: item.created_at,
     })),
-    submissions: demoState.submissions
-      .filter((item) => item.userId === userId)
+    submissions: submissions
       .map((item) => ({
         ...item,
         linkedListingTitle: item.linkedListingId ? getVehicleTitle(item.linkedListingId, vehicleTitles) : undefined,
@@ -283,11 +282,11 @@ export async function getChatForViewer(userId: string, canViewAll: boolean) {
 
 export async function getSupportData() {
   const client = createAdminClient();
-  const [vehicleTitles, profilesMap, settings, demoState, reservations, resales, waitlist, activities] = await Promise.all([
+  const [vehicleTitles, profilesMap, settings, submissions, reservations, resales, waitlist, activities] = await Promise.all([
     getVehicleTitles(),
     getProfilesMap(),
     getAppSettings(),
-    readPortalStore(),
+    getSellerSubmissions(),
     client.from("reservation_requests").select("*").order("created_at", { ascending: false }),
     client.from("resale_requests").select("*").order("created_at", { ascending: false }),
     client.from("reservation_waitlist").select("*").order("created_at", { ascending: false }),
@@ -325,7 +324,7 @@ export async function getSupportData() {
       createdAt: item.created_at,
     })),
     settings,
-    submissions: demoState.submissions,
+    submissions,
     users: authUsers.users.map((user) => {
       const profile = profilesMap.get(user.id);
       return {
@@ -438,6 +437,6 @@ export async function getVehicleChatThread(listingId: string, userId: string) {
 }
 
 export async function getVehicleMeta(listingId: string) {
-  const record = await getVehicleRecord(listingId, true);
+  const record = await getVehicleRecord(listingId, true, true);
   return record ? `${record.year} ${record.make} ${record.model}` : listingId;
 }

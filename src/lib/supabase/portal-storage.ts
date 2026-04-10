@@ -1,11 +1,8 @@
 import "server-only";
 
+import { blurPlateRegion } from "@/lib/media/plate-blur";
 import { createAdminClient } from "@/lib/supabase/admin-client";
-
-interface MediaInput {
-  displayOrder: number;
-  storagePath: string;
-}
+import { MediaInput, PersistedVehicleMedia } from "@/lib/supabase/vehicle-media-variants";
 
 function getExtension(mimeType: string) {
   if (mimeType.includes("png")) return "png";
@@ -38,33 +35,110 @@ function canRemoveObject(path: string) {
   return !path.startsWith("/") && !path.startsWith("http://") && !path.startsWith("https://");
 }
 
+function buildBlurredPath(path: string) {
+  const lastDot = path.lastIndexOf(".");
+  if (lastDot === -1) {
+    return `${path}-blurred.webp`;
+  }
+
+  return `${path.slice(0, lastDot)}-blurred.webp`;
+}
+
+async function readStoredVehicleImage(path: string) {
+  const client = createAdminClient();
+  const { data, error } = await client.storage.from("vehicle-images").download(path);
+
+  if (error || !data) {
+    throw new Error(error?.message ?? "Unable to download vehicle image.");
+  }
+
+  const buffer = Buffer.from(await data.arrayBuffer());
+
+  return {
+    buffer,
+    mimeType: data.type || "image/webp",
+  };
+}
+
+async function uploadVehicleImage(path: string, buffer: Buffer, contentType: string) {
+  const client = createAdminClient();
+  const { error } = await client.storage.from("vehicle-images").upload(path, buffer, {
+    contentType,
+    upsert: false,
+  });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}
+
+async function createBlurredVariant(
+  source: { buffer: Buffer; mimeType: string },
+  originalStoragePath: string,
+) {
+  const blurred = await blurPlateRegion(source.buffer);
+  const blurredStoragePath = buildBlurredPath(originalStoragePath);
+  await uploadVehicleImage(blurredStoragePath, blurred.buffer, blurred.contentType);
+  return blurredStoragePath;
+}
+
 export async function uploadVehicleMedia(listingId: string, media: MediaInput[]) {
   const client = createAdminClient();
-  const uploaded = await Promise.all(
-    media.map(async (item) => {
+  const uploadedPaths: string[] = [];
+  const uploaded: PersistedVehicleMedia[] = [];
+
+  try {
+    for (const item of media) {
       if (!isDataUrl(item.storagePath)) {
-        return item;
+        const originalStoragePath = item.originalStoragePath ?? item.storagePath;
+        if (item.blurredStoragePath) {
+          uploaded.push({
+            blurredStoragePath: item.blurredStoragePath,
+            displayOrder: item.displayOrder,
+            originalStoragePath,
+          });
+          continue;
+        }
+
+        const source = await readStoredVehicleImage(originalStoragePath);
+        const blurredStoragePath = await createBlurredVariant(source, originalStoragePath);
+        uploadedPaths.push(blurredStoragePath);
+        uploaded.push({
+          blurredStoragePath,
+          displayOrder: item.displayOrder,
+          originalStoragePath,
+        });
+        continue;
       }
 
       const parsed = parseDataUrl(item.storagePath);
-      const path = `${listingId}/${crypto.randomUUID()}.${getExtension(parsed.mimeType)}`;
-      const { error } = await client.storage.from("vehicle-images").upload(path, parsed.buffer, {
+      const originalStoragePath = `${listingId}/${crypto.randomUUID()}.${getExtension(parsed.mimeType)}`;
+      const { error } = await client.storage.from("vehicle-images").upload(originalStoragePath, parsed.buffer, {
         contentType: parsed.mimeType,
         upsert: false,
       });
-
       if (error) {
         throw new Error(error.message);
       }
+      uploadedPaths.push(originalStoragePath);
 
-      return {
+      const blurredStoragePath = await createBlurredVariant(parsed, originalStoragePath);
+      uploadedPaths.push(blurredStoragePath);
+      uploaded.push({
+        blurredStoragePath,
         displayOrder: item.displayOrder,
-        storagePath: path,
-      };
-    })
-  );
+        originalStoragePath,
+      });
+    }
 
-  return uploaded.sort((left, right) => left.displayOrder - right.displayOrder);
+    return uploaded.sort((left, right) => left.displayOrder - right.displayOrder);
+  } catch (error) {
+    if (uploadedPaths.length) {
+      await removeVehicleMedia(uploadedPaths);
+    }
+
+    throw error;
+  }
 }
 
 export async function uploadVoiceNote(senderId: string, value: string) {

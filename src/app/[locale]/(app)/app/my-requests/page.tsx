@@ -5,6 +5,55 @@ import { requireViewer } from "@/lib/auth/viewer";
 import { getRequestsForViewer } from "@/lib/portal/operations";
 import { MySubmissionsPanel } from "@/modules/requests/components/my-submissions-panel";
 
+interface RequestPageCopy {
+  created: string;
+  description: string;
+  eyebrow: string;
+  request: string;
+  requests: string;
+  reservations: string;
+  resales: string;
+  status: string;
+  title: string;
+  uploads: string;
+  vehicle: string;
+  waitlist: string;
+}
+
+function getCopy(locale: string): RequestPageCopy {
+  if (locale === "hi") {
+    return {
+      created: "\u092c\u0928\u093e\u092f\u093e \u0917\u092f\u093e",
+      description: "\u0906\u0930\u0915\u094d\u0937\u0923 \u0905\u0928\u0941\u0930\u094b\u0927, \u0935\u0947\u091f\u0932\u093f\u0938\u094d\u091f, \u092a\u0941\u0928\u0930\u094d\u0935\u093f\u0915\u094d\u0930\u092f \u0917\u0924\u093f\u0935\u093f\u0927\u093f \u0914\u0930 \u0905\u092a\u0928\u0947 \u0905\u092a\u0932\u094b\u0921 \u090f\u0915 \u0939\u0940 \u091c\u0917\u0939 \u0938\u0947 \u091f\u094d\u0930\u0948\u0915 \u0915\u0930\u0947\u0902\u0964",
+      eyebrow: "\u092e\u0947\u0930\u0940 \u0917\u0924\u093f\u0935\u093f\u0927\u093f",
+      request: "\u0905\u0928\u0941\u0930\u094b\u0927",
+      requests: "\u092e\u0947\u0930\u0947 \u0905\u0928\u0941\u0930\u094b\u0927",
+      reservations: "\u0906\u0930\u0915\u094d\u0937\u0923 \u0905\u0928\u0941\u0930\u094b\u0927",
+      resales: "\u092a\u0941\u0928\u0930\u094d\u0935\u093f\u0915\u094d\u0930\u092f \u0905\u0928\u0941\u0930\u094b\u0927",
+      status: "\u0938\u094d\u0925\u093f\u0924\u093f",
+      title: "\u0905\u0928\u0941\u0930\u094b\u0927 \u0915\u0947\u0902\u0926\u094d\u0930",
+      uploads: "\u092e\u0947\u0930\u0947 \u0905\u092a\u0932\u094b\u0921",
+      vehicle: "\u0935\u093e\u0939\u0928",
+      waitlist: "\u0935\u0947\u091f\u0932\u093f\u0938\u094d\u091f",
+    };
+  }
+
+  return {
+    created: "Created",
+    description: "Follow reservation requests, waitlist entries, resale activity, and your uploaded vehicles from one place.",
+    eyebrow: "My Activity",
+    request: "Request",
+    requests: "My Requests",
+    reservations: "Reservation Requests",
+    resales: "Resale Requests",
+    status: "Status",
+    title: "Requests center",
+    uploads: "My Uploads",
+    vehicle: "Vehicle",
+    waitlist: "Waitlist",
+  };
+}
+
 export default async function MyRequestsPage({
   params,
 }: {
@@ -13,27 +62,7 @@ export default async function MyRequestsPage({
   const { locale } = await params;
   const viewer = await requireViewer(locale);
   const requests = await getRequestsForViewer(viewer.profile.id);
-  const copy = locale === "hi"
-    ? {
-        description: "आरक्षण, वेटलिस्ट और अपने अपलोड एक ही जगह से ट्रैक करें।",
-        eyebrow: "मेरी गतिविधि",
-        reservations: "आरक्षण अनुरोध",
-        requests: "मेरे अनुरोध",
-        resales: "पुनर्विक्रय अनुरोध",
-        title: "अनुरोध केंद्र",
-        uploads: "मेरे अपलोड",
-        waitlist: "वेटलिस्ट",
-      }
-    : {
-        description: "Follow reservation requests, waitlist entries, resale activity, and your uploaded vehicles from one place.",
-        eyebrow: "My Activity",
-        reservations: "Reservation Requests",
-        requests: "My Requests",
-        resales: "Resale Requests",
-        title: "Requests center",
-        uploads: "My Uploads",
-        waitlist: "Waitlist",
-      };
+  const copy = getCopy(locale);
 
   return (
     <div className="space-y-6">
@@ -66,9 +95,39 @@ export default async function MyRequestsPage({
                 rows={requests.submissions}
               />
             </TabsContent>
-            <TabsContent value="reservations"><RequestTable rows={requests.reservations.map((item) => ({ id: item.id, listing: item.listingTitle, status: item.status, createdAt: item.createdAt }))} /></TabsContent>
-            <TabsContent value="waitlist"><RequestTable rows={requests.waitlist.map((item) => ({ id: item.id, listing: item.listingTitle, status: `Position ${item.position} / ${item.status}`, createdAt: item.createdAt }))} /></TabsContent>
-            <TabsContent value="resales"><RequestTable rows={requests.resales.map((item) => ({ id: item.id, listing: item.listingTitle, status: item.status, createdAt: item.createdAt }))} /></TabsContent>
+            <TabsContent value="reservations">
+              <RequestTable
+                copy={copy}
+                rows={requests.reservations.map((item) => ({
+                  createdAt: item.createdAt,
+                  id: item.id,
+                  listing: item.listingTitle,
+                  status: item.status,
+                }))}
+              />
+            </TabsContent>
+            <TabsContent value="waitlist">
+              <RequestTable
+                copy={copy}
+                rows={requests.waitlist.map((item) => ({
+                  createdAt: item.createdAt,
+                  id: item.id,
+                  listing: item.listingTitle,
+                  status: `Position ${item.position} / ${item.status}`,
+                }))}
+              />
+            </TabsContent>
+            <TabsContent value="resales">
+              <RequestTable
+                copy={copy}
+                rows={requests.resales.map((item) => ({
+                  createdAt: item.createdAt,
+                  id: item.id,
+                  listing: item.listingTitle,
+                  status: item.status,
+                }))}
+              />
+            </TabsContent>
           </Tabs>
         </CardContent>
       </Card>
@@ -77,18 +136,20 @@ export default async function MyRequestsPage({
 }
 
 function RequestTable({
+  copy,
   rows,
 }: {
-  rows: Array<{ id: string; listing: string; status: string; createdAt: string }>;
+  copy: Pick<RequestPageCopy, "created" | "request" | "status" | "vehicle">;
+  rows: Array<{ createdAt: string; id: string; listing: string; status: string }>;
 }) {
   return (
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>Request</TableHead>
-          <TableHead>Vehicle</TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead>Created</TableHead>
+          <TableHead>{copy.request}</TableHead>
+          <TableHead>{copy.vehicle}</TableHead>
+          <TableHead>{copy.status}</TableHead>
+          <TableHead>{copy.created}</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>

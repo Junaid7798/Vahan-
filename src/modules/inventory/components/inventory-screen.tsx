@@ -29,28 +29,47 @@ export function InventoryScreen({
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
   const inventoryT = useTranslations("inventory");
+  const offlineT = useTranslations("offline");
 
   function runAction(action: "create_inquiry" | "create_resale" | "create_reservation", listingId: string) {
     startTransition(async () => {
       try {
         if (action === "create_inquiry") {
-          await postPortalAction("create_inquiry", {
+          const result = await postPortalAction("create_inquiry", {
             listingId,
             message: inventoryT("followUpPrompt"),
             preferredContactMethod: "chat",
             subject: inventoryT("inquirySubject", { listingId }),
           });
-          toast({ title: inventoryT("inquirySentTitle"), description: inventoryT("inquirySentDescription") });
+          toast({
+            title: result.queued ? offlineT("queuedTitle") : inventoryT("inquirySentTitle"),
+            description: result.queued ? offlineT("queuedDescription") : inventoryT("inquirySentDescription"),
+          });
+          if (result.queued) {
+            return;
+          }
         }
 
         if (action === "create_reservation") {
-          await postPortalAction("create_reservation", { listingId, message: inventoryT("reservationPrompt") });
-          toast({ title: inventoryT("requestCapturedTitle"), description: inventoryT("requestCapturedDescription") });
+          const result = await postPortalAction("create_reservation", { listingId, message: inventoryT("reservationPrompt") });
+          toast({
+            title: result.queued ? offlineT("queuedTitle") : inventoryT("requestCapturedTitle"),
+            description: result.queued ? offlineT("queuedDescription") : inventoryT("requestCapturedDescription"),
+          });
+          if (result.queued) {
+            return;
+          }
         }
 
         if (action === "create_resale") {
-          await postPortalAction("create_resale", { expectedTimeline: "flexible", listingId });
-          toast({ title: inventoryT("resaleSentTitle"), description: inventoryT("resaleSentDescription") });
+          const result = await postPortalAction("create_resale", { expectedTimeline: "flexible", listingId });
+          toast({
+            title: result.queued ? offlineT("queuedTitle") : inventoryT("resaleSentTitle"),
+            description: result.queued ? offlineT("queuedDescription") : inventoryT("resaleSentDescription"),
+          });
+          if (result.queued) {
+            return;
+          }
         }
 
         router.refresh();

@@ -10,7 +10,11 @@ export default async function VehicleDetailPage({
 }) {
   const { locale, listingId } = await params;
   const viewer = await requireViewer(locale);
-  const record = await getVehicleRecord(listingId, viewer.permissions.canViewFinancials);
+  const record = await getVehicleRecord(
+    listingId,
+    viewer.permissions.canViewFinancials,
+    viewer.permissions.canManageVehicles,
+  );
 
   if (!record) {
     notFound();

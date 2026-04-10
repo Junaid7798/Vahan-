@@ -74,7 +74,13 @@ describe("createVehicle", () => {
     };
 
     vi.mocked(createAdminClient).mockReturnValue(client as never);
-    vi.mocked(uploadVehicleMedia).mockResolvedValue([{ displayOrder: 0, storagePath: "listing-1/photo.jpg" }]);
+    vi.mocked(uploadVehicleMedia).mockResolvedValue([
+      {
+        blurredStoragePath: "listing-1/photo-blurred.webp",
+        displayOrder: 0,
+        originalStoragePath: "listing-1/photo.jpg",
+      },
+    ]);
 
     await expect(
       createVehicle(
@@ -89,7 +95,7 @@ describe("createVehicle", () => {
       )
     ).rejects.toThrow("media insert failed");
 
-    expect(removeVehicleMedia).toHaveBeenCalledWith(["listing-1/photo.jpg"]);
+    expect(removeVehicleMedia).toHaveBeenCalledWith(["listing-1/photo.jpg", "listing-1/photo-blurred.webp"]);
     expect(deletedListings).toEqual(["listing-1"]);
     expect(deletedVehicles).toEqual(["vehicle-1"]);
     expect(logPortalActivity).not.toHaveBeenCalled();

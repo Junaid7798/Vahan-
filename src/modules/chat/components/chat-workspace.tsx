@@ -169,13 +169,16 @@ export function ChatWorkspace({ initialThreadId, isStaff = false, messages, thre
                 setLocalMessages((current) => [...current, optimisticMessage]);
                 setLocalThreads((current) => current.map((thread) => thread.id === activeThread.id ? { ...thread, updatedAt: optimisticMessage.createdAt } : thread));
 
-                await postPortalAction("send_chat_message", {
+                const result = await postPortalAction("send_chat_message", {
                   content: resolvedContent,
                   messageType: type,
                   threadId: activeThread.id,
                   voiceDuration,
                 });
-                router.refresh();
+
+                if (!result.queued) {
+                  router.refresh();
+                }
               } catch (error) {
                 setLocalMessages((current) => current.filter((message) => message.id !== optimisticId));
                 setLocalThreads((current) => current.map((thread) => thread.id === activeThread.id ? { ...thread, updatedAt: previousUpdatedAt } : thread));

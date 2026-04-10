@@ -1,5 +1,88 @@
 # HANDOFF
 
+## Current Snapshot
+
+Use this section as the source of truth. Older notes below are retained for history and may be stale.
+
+### Goal
+
+Continue the private used-vehicle portal as a mobile-first bilingual app with Supabase-backed production flows, blurred user-facing vehicle media, and a future-safe path to PWA or thin-wrapper packaging.
+
+### Current Progress
+
+- Auth JSON failure handling is fixed. `/api/auth/*` now falls back to JSON errors, and auth forms no longer crash on unexpected non-JSON bodies.
+- Supabase is the primary read and write path in code when configured for:
+  - inventory
+  - requests
+  - chat
+  - profile
+  - settings
+  - seller submissions
+- Vehicle media now uses paired original and blurred variants:
+  - staff reads original media
+  - approved user-facing inventory and detail reads blurred media
+- Seller submissions are now migrated in code to the Supabase path:
+  - create, edit, delete, status update, and listing conversion all go through `seller_submissions`
+  - submission media is stored under submission-owned paths
+  - submission-to-listing conversion clones media into listing-owned uploads instead of path-sharing
+- The offline queue is now wired for the main user portal create flows:
+  - `create_inquiry`
+  - `create_reservation`
+  - `create_resale`
+  - `send_chat_message`
+  - queued actions replay through `/api/portal` in Supabase mode and `/api/demo/portal` in demo mode
+- The PWA readiness checklist now exists in `docs/PWA_READINESS.md`.
+- Lower-priority localization cleanup was partially advanced on the seller-submissions and my-requests routes.
+
+### What Worked
+
+- Keeping demo fallback at the portal client and route layer still makes local work safe while letting Supabase stay primary when configured.
+- Treating blurred listing media and submission media as different ownership domains avoided destructive cross-flow deletes.
+- Queueing only the user-safe create flows kept offline behavior simple enough to ship without inventing unreliable staff moderation semantics.
+- Using route-level `/api/portal` actions for replay avoided maintaining a separate offline-only transport layer.
+
+### What Didn't Work
+
+- Earlier docs became stale and started contradicting the implementation.
+- Vitest startup can fail inside the sandbox with `spawn EPERM`; the same test commands passed when rerun with elevated permissions.
+- The local worktree still has noise files that were intentionally not deleted in this session.
+
+### Next Steps
+
+1. Apply the full Supabase migration chain in the real project, including:
+   - `20260408_001_initial_schema.sql`
+   - `20260408_002_rls_policies.sql`
+   - `20260408_003_storage_buckets.sql`
+   - `20260408_004_seed_data.sql`
+   - `20260408_005_security_and_chat_fixes.sql`
+   - `20260409_001_portal_primary_extensions.sql`
+   - `20260410_001_reservation_guardrails.sql`
+   - `20260411_001_seller_submission_upgrade.sql`
+2. Finish the lower-priority admin localization pass.
+3. Add offline E2E coverage plus a visible queued-action history or retry surface.
+4. Decide and validate the actual packaging route from `docs/PWA_READINESS.md`.
+5. Add a legacy-image blur backfill job if old inventory needs user-facing coverage without manual re-save.
+6. Delete local noise files only if explicitly approved: `.server-5000.*` and `nul`.
+
+### External Follow-up Required
+
+- Real Supabase migration apply and environment validation still require your actual project access.
+- Packaged-shell validation for Android or iOS has not been run.
+- Destructive cleanup of local noise files was intentionally not performed without explicit approval.
+
+### Verification
+
+- `npm test` passed: 14 files, 22 tests.
+- `npm run typecheck` passed.
+- Targeted `eslint` on the touched files passed.
+- `npm run build` passed.
+
+### Practical Restart Prompt
+
+`Continue from HANDOFF.md current snapshot: apply the real Supabase migrations, then finish offline E2E coverage and the remaining admin localization cleanup without reopening the completed auth, plate-blur, seller-submission, or queue wiring work.`
+
+## Archived Older Notes
+
 ## Goal
 
 Continue the private used-vehicle portal with these active priorities:
@@ -190,3 +273,91 @@ Verification status for the current workspace:
 - `lint`: passed
 - `test`: passed
 - `build`: passed
+
+## 2026-04-10 Session Close Update
+
+- GitHub push is complete:
+  - branch: `master`
+  - remote: `origin`
+  - commit: `6ce8754`
+  - message: `Complete Supabase portal migration and fixes`
+
+- Local-only files intentionally not pushed:
+  - `.server-5000.err.log`
+  - `.server-5000.out.log`
+  - `nul`
+
+- New unresolved issue reported after the push:
+  - Browser error: `Unexpected token '<', "<div class"... is not valid JSON`
+
+- Most likely source area:
+  - auth client forms still parse JSON directly:
+    - `src/modules/auth/components/login-form.tsx`
+    - `src/modules/auth/components/signup-form.tsx`
+    - `src/modules/auth/components/forgot-password-form.tsx`
+  - if `/api/auth/login`, `/api/auth/signup`, or `/api/auth/reset-password` returns an HTML error page, these forms will throw exactly that parse error before showing a useful message
+  - `src/lib/demo/portal-client.ts` already guards failed JSON parsing, so it is less likely to be the source of the raw browser error string
+
+- Best next debugging step:
+  1. Reproduce the issue and check which request returns HTML in the browser Network tab
+  2. Compare that request with local server logs
+  3. If the failing request is under `/api/auth/*`, inspect `src/app/api/auth/[...path]/route.ts` and any route imports it depends on
+  4. Harden the auth forms to avoid direct `response.json()` assumptions once the failing route is confirmed
+
+## 2026-04-10 Follow-up Update
+
+- The auth JSON parse issue is now fixed in code.
+- What changed:
+  - `src/app/api/auth/[...path]/route.ts` now catches unexpected auth-route failures and returns a JSON `500` payload instead of letting Next.js fall through to an HTML error page.
+  - `src/modules/auth/lib/read-response-json.ts` was added and is now used by:
+    - `src/modules/auth/components/login-form.tsx`
+    - `src/modules/auth/components/signup-form.tsx`
+    - `src/modules/auth/components/forgot-password-form.tsx`
+  - Targeted regressions were added for both the route fallback and the response parser.
+- What this means:
+  - If demo signup persistence or another auth-route dependency throws, the client now receives a normal JSON error response.
+  - If a non-JSON body still slips through for any reason, the auth forms now fall back to their existing generic error UI instead of throwing `Unexpected token '<'`.
+- Verification completed for this fix:
+  - `npm test -- src/app/api/auth/[...path]/route.test.ts`
+  - `npm test -- src/modules/auth/lib/read-response-json.test.ts`
+  - `npm run typecheck`
+  - targeted `eslint` on the touched auth files
+- Updated practical start point:
+  - resume from the remaining roadmap in the existing execution order:
+    1. lower-priority admin/mobile/localization audit
+    2. PWA readiness checklist for future APK or IPA packaging
+    3. remaining production-track work including seller-submission migration, offline queue wiring, and plate blur
+
+## 2026-04-10 Media Update
+
+- The vehicle plate-blur pipeline is now implemented for the Supabase listing flow.
+- What changed:
+  - New uploads create two stored variants in `vehicle-images`:
+    - original image for staff surfaces
+    - blurred derivative for approved user-facing inventory and detail routes
+  - The pairing logic lives in:
+    - `src/lib/media/plate-blur.ts`
+    - `src/lib/supabase/vehicle-media-variants.ts`
+    - `src/lib/supabase/portal-storage.ts`
+  - The read path now chooses variants by viewer capability:
+    - staff pages resolve original media
+    - approved non-staff inventory and detail pages resolve blurred media
+  - The staff vehicle edit page now reads from the shared portal catalog instead of the demo catalog path, so paired media survives edits in Supabase mode.
+- Important project rule:
+  - In Supabase mode, vehicle photos must preserve both `originalStoragePath` and `blurredStoragePath` through edit flows. Do not collapse them back to one path.
+- Important limitation:
+  - Existing legacy images that were saved before this change do not have a full automatic backfill job yet. They pick up the paired-media model when a staff user re-saves the listing.
+- Verification completed:
+  - focused media regressions
+  - full `npm test`
+  - `npm run typecheck`
+  - targeted `eslint`
+  - `npm run build`
+
+## Remaining Priorities
+
+1. Seller submission persistence still needs a full Supabase migration.
+2. The offline queue still needs wiring into active mutation flows.
+3. The PWA readiness checklist for future APK or IPA packaging is still pending.
+4. Lower-priority admin localization cleanup still remains.
+5. Local repo cleanup noise still exists: `.server-5000.*` and `nul`.

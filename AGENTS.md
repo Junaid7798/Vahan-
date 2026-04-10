@@ -16,3 +16,5 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - For public or auth-facing routes, do not mix fixed light backgrounds with theme-token text colors. Keep the full surface theme-aware or explicitly set both background and foreground together.
 - Theme work should be system work, not one-off color patches. Prefer updating shared tokens, surfaces, and states before touching individual screens.
 - When changing themes, verify contrast and readability on mobile first across auth, forms, sheets, cards, inputs, and empty states.
+- In Supabase mode, vehicle photos are now stored as paired original and blurred variants. Staff flows must preserve both paths on edit, and user-facing inventory/detail reads must resolve blurred variants only.
+- In Supabase mode, seller-submission media must stay separate from listing media. Converting a submission into a listing should clone media into listing-owned paths instead of reusing submission storage paths.

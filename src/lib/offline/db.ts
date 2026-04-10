@@ -20,7 +20,7 @@ export interface OfflineVehicle {
 
 export interface PendingAction {
   id: string;
-  type: "inquiry" | "reservation" | "resale" | "message";
+  type: "create_inquiry" | "create_resale" | "create_reservation" | "send_chat_message";
   payload: unknown;
   createdAt: number;
   synced: boolean;

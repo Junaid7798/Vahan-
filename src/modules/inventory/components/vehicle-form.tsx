@@ -45,9 +45,11 @@ function toState(record?: VehicleRecord | null): VehicleFormState {
 function toMedia(record?: VehicleRecord | null): CompressedImageResult[] {
   return (record?.media ?? []).map((item) => ({
     compressedSize: 0,
+    blurredStoragePath: item.blurredStoragePath,
     dataUrl: item.previewUrl ?? item.storagePath,
     fileName: item.id,
     originalSize: 0,
+    originalStoragePath: item.originalStoragePath,
     storagePath: item.storagePath,
   }));
 }
@@ -83,7 +85,12 @@ export function VehicleForm({ initialRecord, mode, showFinancials }: VehicleForm
       body: JSON.stringify({
         bodyType: form.bodyType, color: form.color, conditionNotes: form.conditionNotes, documentationCost: toNumber(form.documentationCost), extraSpend: toNumber(form.extraSpend),
         fuelType: form.fuelType, highlights: form.highlights, internalNotes: form.internalNotes, location: form.location, maintenanceCost: toNumber(form.maintenanceCost), make: form.make,
-        media: media.map((item, index) => ({ displayOrder: index + 1, storagePath: item.storagePath ?? item.dataUrl })), mileage: toNumber(form.mileage), model: form.model, otherCost: toNumber(form.otherCost),
+        media: media.map((item, index) => ({
+          blurredStoragePath: item.blurredStoragePath,
+          displayOrder: index + 1,
+          originalStoragePath: item.originalStoragePath,
+          storagePath: item.storagePath ?? item.dataUrl,
+        })), mileage: toNumber(form.mileage), model: form.model, otherCost: toNumber(form.otherCost),
         procurementPrice: toNumber(form.procurementPrice), registrationYear: toNumber(form.registrationYear), status: form.status, targetSellingPrice: toNumber(form.targetSellingPrice),
         transmission: form.transmission, transportCost: toNumber(form.transportCost), variant: form.variant, vin: form.vin, year: Number(form.year),
       }),

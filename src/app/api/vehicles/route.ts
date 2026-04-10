@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getViewerContext } from "@/lib/auth/viewer";
 import { isSupabaseConfigured } from "@/lib/auth/session";
 import { createVehicle } from "@/lib/supabase/portal-vehicles";
+import { MediaInput } from "@/lib/supabase/vehicle-media-variants";
 
 interface VehiclePayload {
   bodyType?: string;
@@ -15,7 +16,7 @@ interface VehiclePayload {
   location?: string;
   maintenanceCost?: number;
   make: string;
-  media?: Array<{ displayOrder: number; storagePath: string }>;
+  media?: MediaInput[];
   mileage?: number;
   model: string;
   otherCost?: number;

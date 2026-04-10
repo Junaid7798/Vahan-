@@ -25,8 +25,10 @@ export interface DemoUserAccount {
 }
 
 export interface VehicleMediaRecord {
+  blurredStoragePath?: string;
   id: string;
   storagePath: string;
+  originalStoragePath?: string;
   previewUrl?: string;
   mediaType: "image";
   isBlurred: boolean;

@@ -1,4 +1,4 @@
-import { getPendingActions, markActionSynced, type PendingAction } from "./db";
+import { clearSyncedActions, getPendingActions, markActionSynced, type PendingAction } from "./db";
 
 export interface SyncResult {
   success: boolean;
@@ -44,44 +44,12 @@ export async function syncPendingActions(): Promise<SyncResult> {
 
 async function syncAction(action: PendingAction): Promise<void> {
   const baseUrl = window.location.origin;
-  let response: Response;
-
-  switch (action.type) {
-    case "inquiry":
-      response = await fetch(`${baseUrl}/api/inquiries`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(action.payload),
-      });
-      break;
-
-    case "reservation":
-      response = await fetch(`${baseUrl}/api/reservations`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(action.payload),
-      });
-      break;
-
-    case "resale":
-      response = await fetch(`${baseUrl}/api/resale`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(action.payload),
-      });
-      break;
-
-    case "message":
-      response = await fetch(`${baseUrl}/api/chat/messages`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(action.payload),
-      });
-      break;
-
-    default:
-      throw new Error(`Unknown action type: ${action.type}`);
-  }
+  const portalPath = process.env.NEXT_PUBLIC_SUPABASE_URL ? "/api/portal" : "/api/demo/portal";
+  const response = await fetch(`${baseUrl}${portalPath}`, {
+    body: JSON.stringify({ action: action.type, payload: action.payload }),
+    headers: { "Content-Type": "application/json" },
+    method: "POST",
+  });
 
   if (!response.ok) {
     throw new Error(`Sync failed with status ${response.status}`);
@@ -94,9 +62,10 @@ export function setupAutoSync(): () => void {
   }
 
   const handleOnline = () => {
-    void syncPendingActions();
+    void syncPendingActions().then(() => clearSyncedActions());
   };
 
+  handleOnline();
   window.addEventListener("online", handleOnline);
 
   return () => {

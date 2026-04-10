@@ -1,249 +1,151 @@
-# Vahan - Vehicle Inventory Portal
+# Vahan - App Structure Snapshot
 
-## Page Structure & Navigation
+## Route Tree
 
-### Authentication Pages (Unauthenticated)
-| Page | URL | Purpose | Components |
-|------|-----|---------|-------------|
-| Login | `/{locale}/login` | User authentication | LoginForm |
-| Signup | `/{locale}/signup` | New user registration | SignupForm |
-| Pending Approval | `/{locale}/pending-approval` | Shown after signup | Static message |
-| Access Denied | `/{locale}/access-denied` | Blocked access | Static message |
+### Public and auth-facing routes
+| Route | Purpose | Main surface |
+|---|---|---|
+| `/` | Locale redirect | Root redirect |
+| `/{locale}` | Locale landing redirect | Locale entry |
+| `/{locale}/login` | Login | `LoginForm` |
+| `/{locale}/signup` | Signup | `SignupForm` |
+| `/{locale}/forgot-password` | Password reset request | `ForgotPasswordForm` |
+| `/{locale}/pending-approval` | Awaiting approval state | Pending approval screen |
+| `/{locale}/access-denied` | Blocked access state | Access denied screen |
 
-### Authenticated Pages (App Shell)
-| Page | URL | Purpose | Components |
-|------|-----|---------|-------------|
-| Dashboard | `/{locale}/app` | Overview & quick stats | Stat cards, Quick actions |
-| Inventory | `/{locale}/app/inventory` | Browse vehicle listings | VehicleGrid, VehicleCard |
-| Reserved | `/{locale}/app/reserved` | Reserved vehicles | Not implemented |
-| Sold | `/{locale}/app/sold` | Sold vehicles | Not implemented |
-| Inquiries | `/{locale}/app/inquiries` | My inquiries | Not implemented |
-| Chat | `/{locale}/app/chat` | Messaging | ChatWindow, ChatThreadList |
-| My Requests | `/{locale}/app/my-requests` | My reservations/waitlist | Not implemented |
-| Profile | `/{locale}/app/profile` | User settings | Account info, Preferences |
+### Authenticated user routes
+| Route | Purpose | Main surface |
+|---|---|---|
+| `/{locale}/app` | Role-aware dashboard | User or staff dashboard |
+| `/{locale}/app/inventory` | Published inventory | `InventoryScreen` |
+| `/{locale}/app/reserved` | Reserved inventory | `InventoryScreen` |
+| `/{locale}/app/sold` | Sold inventory | `InventoryScreen` |
+| `/{locale}/app/inquiries` | Inquiry queue | Inquiry route |
+| `/{locale}/app/chat` | Thread list | Chat inbox |
+| `/{locale}/app/chat/[threadId]` | Thread detail | Chat workspace |
+| `/{locale}/app/my-requests` | Requests, uploads, waitlist | Request dashboard |
+| `/{locale}/app/profile` | Profile and preferences | Profile form |
+| `/{locale}/app/vehicles/[listingId]` | Vehicle detail | `VehicleDetailScreen` |
 
-### Admin Pages (Not implemented)
-- `/app/admin/users` - User management
-- `/app/admin/vehicles` - Vehicle management
-- `/app/admin/seller-submissions` - Seller submissions
-- `/app/admin/reservation-requests` - Reservation management
-- `/app/admin/waitlist` - Waitlist management
-- `/app/admin/resale-requests` - Resale requests
-- `/app/admin/chat` - Admin chat
-- `/app/admin/settings` - Settings
-
----
-
-## Button & Action Mapping
-
-### Navigation Sidebar
-| Button/Link | Action | Target |
-|-------------|--------|--------|
-| Dashboard | Navigate to | `/{locale}/app` |
-| Inventory | Navigate to | `/{locale}/app/inventory` |
-| Reserved | Navigate to | `/{locale}/app/reserved` |
-| Sold | Navigate to | `/{locale}/app/sold` |
-| Inquiries | Navigate to | `/{locale}/app/inquiries` |
-| Chat | Navigate to | `/{locale}/app/chat` |
-| My Requests | Navigate to | `/{locale}/app/my-requests` |
-| Profile | Navigate to | `/{locale}/app/profile` |
-| Logout | POST /api/auth/logout | Redirect to login |
-
-### Login Page
-| Button | Action |
-|--------|--------|
-| Login (submit) | POST /api/auth/login → Redirect /en/app |
-| Forgot Password | Navigate to /en/forgot-password (not implemented) |
-| Signup Link | Navigate to /en/signup |
-
-### Signup Page
-| Button | Action |
-|--------|--------|
-| Create Account | POST /api/auth/signup → Redirect /en/pending-approval |
-| Login Link | Navigate to /en/login |
-
-### Dashboard Page
-| Button | Action |
-|--------|--------|
-| Browse Inventory | Navigate to /{locale}/app/inventory |
-| Start Chat | Navigate to /{locale}/app/chat |
-| My Profile | Navigate to /{locale}/app/profile |
-
-### Vehicle Card Component
-| Button | Action |
-|--------|--------|
-| Heart (Save) | Toggle save (not implemented) |
-| Share | Open share dialog (not implemented) |
-| View Details | Navigate to vehicle detail |
-| Reserve | Open reservation dialog |
-| Inquiry | Open inquiry dialog |
-
-### Vehicle Detail Page
-| Button | Action |
-|--------|--------|
-| Back | Navigate back |
-| Reserve Interest | Open reservation dialog |
-| Send Inquiry | Open inquiry dialog |
-| Save (Heart) | Toggle save (not implemented) |
-| Share | Open share dialog (not implemented) |
-
-### Reservation Form Dialog
-| Button | Action |
-|--------|--------|
-| Reserve Interest (trigger) | Open dialog |
-| Submit Request | POST reservation (not implemented) |
-| Cancel | Close dialog |
-
-### Inquiry Form Dialog
-| Button | Action |
-|--------|--------|
-| Send Inquiry (trigger) | Open dialog |
-| Send | POST inquiry (not implemented) |
-| Cancel | Close dialog |
-
-### Chat Window
-| Button | Action |
-|--------|--------|
-| Phone | Start voice call (not implemented) |
-| Video | Start video call (not implemented) |
-| More | Open options menu (not implemented) |
-| Attachment | Open file picker |
-| Image | Open image picker |
-| Mic | Start voice recording |
-| Send | Send message |
-
-### Profile Page
-| Button | Action |
-|--------|--------|
-| Sign Out | POST /api/auth/logout → Redirect /{locale}/login |
-
----
-
-## Component Library
-
-### UI Components (shadcn/ui)
-| Component | Location | Usage |
-|-----------|----------|-------|
-| Button | components/ui/button.tsx | Actions, links |
-| Card | components/ui/card.tsx | Content containers |
-| Dialog | components/ui/dialog.tsx | Modal forms |
-| Form | components/ui/form.tsx | Form fields |
-| Input | components/ui/input.tsx | Text fields |
-| Label | components/ui/label.tsx | Field labels |
-| Textarea | components/ui/textarea.tsx | Multi-line text |
-| Select | components/ui/select.tsx | Dropdowns |
-| Badge | components/ui/badge.tsx | Status badges |
-| Avatar | components/ui/avatar.tsx | User avatars |
-| Table | components/ui/table.tsx | Data tables |
-| Tabs | components/ui/tabs.tsx | Tab navigation |
-| DropdownMenu | components/ui/dropdown-menu.tsx | Menus |
-| Popover | components/ui/popover.tsx | Popups |
-| Tooltip | components/ui/tooltip.tsx | Hover hints |
-| Sheet | components/ui/sheet.tsx | Side sheets |
-| Toast | components/ui/toast.tsx | Notifications |
-| Skeleton | components/ui/skeleton.tsx | Loading states |
-| Separator | components/ui/separator.tsx | Dividers |
-| ScrollArea | components/ui/scroll-area.tsx | Scrollable areas |
-| Alert | components/ui/alert.tsx | Alerts |
-
-### Feature Components
-| Component | Location | Purpose |
-|-----------|----------|---------|
-| VehicleCard | components/vehicle/ | Vehicle listing card |
-| VehicleGrid | components/vehicle/ | Filterable vehicle list |
-| VehicleDetail | components/vehicle/ | Full vehicle details |
-| ReservationForm | components/reservation/ | Reserve vehicle dialog |
-| WaitlistButton | components/reservation/ | Join waitlist |
-| InquiryForm | components/inquiry/ | Send inquiry dialog |
-| ChatWindow | components/chat/ | Chat interface |
-| ChatProvider | components/chat/ | Chat state management |
-| SellerSubmissionForm | components/seller/ | Sell vehicle form |
-| ResaleRequestForm | components/seller/ | Request resale |
-| OnlineStatusIndicator | components/ | Offline indicator |
-
----
-
-## Database Schema (Supabase)
-
-### Tables
-- `user_profiles` - User role, approval status, financials access
-- `vehicles` - Physical vehicle attributes (make, model, year, etc.)
-- `vehicle_listings` - Sellable inventory with pricing and status
-- `vehicle_media` - Images and media for listings
-- `seller_submissions` - External seller vehicle submissions
-- `inquiries` - User inquiries about vehicles
-- `reservation_requests` - Vehicle reservation requests
-- `reservation_waitlist` - Waitlist for reserved vehicles
-- `resale_requests` - User resale requests
-- `chat_threads` - Chat conversations
-- `chat_participants` - Thread participants
-- `chat_messages` - Messages (text, voice, image)
-- `activity_logs` - User actions log
-
----
-
-## Current Issues & Gaps
-
-### Not Implemented
-1. **Reserved, Sold, Inquiries, My Requests pages** - Empty/stub pages
-2. **All Admin pages** - Not created
-3. **Forgot Password** - Link exists but page doesn't
-4. **Vehicle Detail Page** - No actual page, just component
-5. **Save/Favorite vehicles** - Button exists but not functional
-6. **Share functionality** - Button exists but not functional
-7. **Offline sync** - IndexedDB setup exists but not connected to UI
-8. **User approval workflow** - Admin approval not implemented
-
-### Bugs/Issues
-1. Hardcoded `/en/` locale in some links instead of using dynamic locale
-2. Dashboard stats are hardcoded (0 values)
-3. Vehicle detail page not accessible (no route)
-4. Chat provider not integrated into the app shell
-5. No error boundaries
-6. No loading states for many pages
-
----
+### Staff routes
+| Route | Purpose | Main surface |
+|---|---|---|
+| `/{locale}/app/admin/users` | User management | Admin queue |
+| `/{locale}/app/admin/vehicles` | Vehicle management | `VehicleManagementTable` |
+| `/{locale}/app/admin/vehicles/new` | Create listing | `VehicleForm` |
+| `/{locale}/app/admin/vehicles/[listingId]/edit` | Edit listing | `VehicleForm` |
+| `/{locale}/app/admin/seller-submissions` | Seller submission queue | Staff submission panel |
+| `/{locale}/app/admin/reservation-requests` | Reservation approvals | Staff queue |
+| `/{locale}/app/admin/waitlist` | Waitlist operations | Staff queue |
+| `/{locale}/app/admin/resale-requests` | Resale requests | Staff queue |
+| `/{locale}/app/admin/chat` | Staff chat inbox | Staff chat panel |
+| `/{locale}/app/admin/settings` | Operational settings | Settings panel |
 
 ## API Routes
 
 | Endpoint | Method | Purpose |
-|----------|--------|---------|
-| `/api/auth/login` | POST | Authenticate user |
-| `/api/auth/signup` | POST | Register new user |
-| `/api/auth/logout` | POST | Sign out user |
+|---|---|---|
+| `/api/auth/login` | `POST` | Login |
+| `/api/auth/signup` | `POST` | Signup |
+| `/api/auth/logout` | `POST` | Logout |
+| `/api/auth/reset-password` | `POST` | Request password reset |
+| `/api/vehicles` | `POST` | Create vehicle listing in Supabase mode |
+| `/api/vehicles/[listingId]` | `PUT`, `DELETE` | Update or delete listing in Supabase mode |
+| `/api/inquiries` | `POST` | Create inquiry |
+| `/api/reservations` | `POST` | Create reservation or waitlist request |
+| `/api/resale` | `POST` | Create resale request |
+| `/api/chat/messages` | `POST` | Send chat message |
+| `/api/portal` | `POST`, `PATCH` | Portal mutations in Supabase mode |
+| `/api/demo/portal` | `POST`, `PATCH` | Demo-mode portal mutations |
+| `/api/demo/vehicles` | `POST` | Demo-mode vehicle create |
+| `/api/demo/vehicles/[listingId]` | `PUT`, `DELETE` | Demo-mode vehicle update and delete |
 
----
+## Core Shared Surfaces
 
-## Feature Flags & Permissions
+### Layout and navigation
+- `src/app/[locale]/(app)/app/layout.tsx`
+- `src/components/layout/app-topbar.tsx`
+- `src/components/layout/app-sidebar.tsx`
+- `src/components/layout/appearance-switcher.tsx`
+- `src/components/layout/topbar-locale-switcher.tsx`
+- `src/components/layout/notification-center.tsx`
 
-### User Roles
-- `admin` - Full access, can manage users, vehicles, approvals
-- `manager` - Can view all listings, manage some operations
-- `user` - Standard user, view approved content only
+### Inventory and detail
+- `src/modules/inventory/components/inventory-screen.tsx`
+- `src/modules/inventory/components/vehicle-detail-screen.tsx`
+- `src/modules/inventory/components/vehicle-form.tsx`
+- `src/modules/inventory/components/photo-upload-field.tsx`
+- `src/components/vehicle/vehicle-grid.tsx`
+- `src/components/vehicle/vehicle-card.tsx`
 
-### Approval Status
-- `pending_approval` - New user awaiting admin approval
-- `approved` - Full access
-- `rejected` - Blocked access
+### Requests, uploads, and chat
+- `src/modules/requests/components/my-submissions-panel.tsx`
+- `src/modules/requests/components/vehicle-submission-form.tsx`
+- `src/components/chat/chat-window.tsx`
+- `src/components/chat/chat-thread-list.tsx`
 
-### Financial Visibility
-- Admins/Managers see all financial data
-- Regular users see target price only (if approved)
-- Procurement cost hidden from regular users
+## Data and Storage Model
 
----
+### Runtime modes
+- Demo mode: local JSON-backed stores under `data/`
+- Supabase mode: auth, database, and private storage via server-side helpers under `src/lib/supabase/`
 
-## PWA Features (Configured)
-- Service worker for offline support
-- Offline indicator component
-- IndexedDB for vehicle data caching
-- Pending actions queue for offline operations
-- Manifest for installable app
+### Primary domain tables
+- `user_profiles`
+- `vehicles`
+- `vehicle_listings`
+- `vehicle_media`
+- `seller_submissions`
+- `inquiries`
+- `reservation_requests`
+- `reservation_waitlist`
+- `resale_requests`
+- `chat_threads`
+- `chat_participants`
+- `chat_messages`
+- `app_settings`
+- `activity_logs`
 
----
+### Media behavior
+- Vehicle uploads are compressed client-side before submit.
+- In Supabase mode, vehicle media now persists as paired original and blurred variants.
+- Staff surfaces resolve original images.
+- Approved user-facing inventory and detail routes resolve blurred variants.
+- Seller-submission uploads persist under submission-scoped storage paths and are cloned into listing-owned media when staff converts a submission into inventory.
+- Voice notes are stored privately in the `voice-notes` bucket.
 
-## i18n Support
-- English (en.json)
-- Hindi (hi.json)
-- Dynamic locale routing via [locale] route group
-- next-intl v4 integration
+## Current Gaps
+
+### Still pending
+1. The real Supabase project still needs the latest migrations applied, including `20260411_001_seller_submission_upgrade.sql`.
+2. The offline queue is wired for the main user portal create flows, but staff moderation flows, queued-action history UI, and offline E2E coverage are still pending.
+3. The PWA readiness checklist now exists in `docs/PWA_READINESS.md`, but the packaging work itself is still pending: icons, splash assets, packaged-shell validation, and mobile offline QA.
+4. Some lower-priority admin helper copy still needs a final localization pass.
+5. Legacy vehicle images saved before the paired-media rollout still do not have a full blur backfill job.
+6. Local cleanup noise still exists in the worktree: `.server-5000.*` and `nul`.
+
+### Already resolved from earlier stale notes
+- Forgot-password route exists.
+- Vehicle detail route exists.
+- Reserved, sold, inquiries, my-requests, and admin routes exist.
+- Error boundaries and not-found routes exist.
+- Chat is integrated into the app shell.
+
+## Permissions Summary
+
+### Roles
+- `admin`: full operational access
+- `manager`: staff access with configurable financial visibility
+- `user`: approved-user access to inventory and own workflows
+
+### Media visibility
+- Staff can resolve original vehicle images.
+- Approved non-staff users only resolve blurred vehicle images for published, reserved, and sold listings.
+- Disabled users cannot access the app.
+
+## PWA and i18n
+
+- `next-intl` locale routing with English and Hindi message bundles
+- Manifest at `/manifest.webmanifest`
+- Service worker wiring present
+- IndexedDB helpers and queued replay are active for inquiry, reservation, resale, and chat-message portal actions; broader offline UX and automated coverage are still pending

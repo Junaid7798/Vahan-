@@ -11,23 +11,30 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   const { path } = await params;
   const route = path.join("/");
 
-  if (route === "login") {
-    return handleLogin(request);
-  }
+  try {
+    if (route === "login") {
+      return await handleLogin(request);
+    }
 
-  if (route === "signup") {
-    return handleSignup(request);
-  }
+    if (route === "signup") {
+      return await handleSignup(request);
+    }
 
-  if (route === "logout") {
-    return handleLogout();
-  }
+    if (route === "logout") {
+      return await handleLogout();
+    }
 
-  if (route === "reset-password") {
-    return handleResetPassword(request);
-  }
+    if (route === "reset-password") {
+      return await handleResetPassword(request);
+    }
 
-  return NextResponse.json({ error: `Route /api/auth/${route} not found` }, { status: 404 });
+    return NextResponse.json({ error: `Route /api/auth/${route} not found` }, { status: 404 });
+  } catch {
+    return NextResponse.json(
+      { error: "Unable to complete this request right now." },
+      { status: 500 },
+    );
+  }
 }
 
 async function handleLogin(request: NextRequest) {

@@ -1,8 +1,10 @@
 export interface CompressedImageResult {
+  blurredStoragePath?: string;
   compressedSize: number;
   dataUrl: string;
   fileName: string;
   originalSize: number;
+  originalStoragePath?: string;
   storagePath?: string;
 }
 

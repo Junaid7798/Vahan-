@@ -4,12 +4,11 @@ import { createAdminClient } from "@/lib/supabase/admin-client";
 import { logPortalActivity } from "@/lib/supabase/portal-activity";
 import {
   buildListingPatch,
-  buildVehicleMediaRows,
   buildVehicleRecord,
-  getNewStoragePaths,
   VehiclePayload,
 } from "@/lib/supabase/portal-vehicle-utils";
 import { removeVehicleMedia, uploadVehicleMedia } from "@/lib/supabase/portal-storage";
+import { buildVehicleMediaRows, getNewStoragePaths } from "@/lib/supabase/vehicle-media-variants";
 
 interface VehicleMediaSnapshot {
   display_order: number;
@@ -251,7 +250,7 @@ export async function updateVehicle(listingId: string, payload: VehiclePayload, 
     if (nextMedia) {
       await replaceVehicleMediaRows(client, listingId, buildVehicleMediaRows(listingId, nextMedia));
       const previousPaths = (currentListing.vehicle_media ?? []).map((item) => item.storage_path);
-      const nextPaths = nextMedia.map((item) => item.storagePath);
+      const nextPaths = nextMedia.flatMap((item) => [item.originalStoragePath, item.blurredStoragePath]);
       await removeVehicleMedia(previousPaths.filter((path) => !nextPaths.includes(path)));
     }
   } catch (error) {

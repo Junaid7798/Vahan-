@@ -193,7 +193,9 @@
   "offline": {
     "offline": "You are offline",
     "online": "You are back online",
-    "changesWillSync": "Changes will sync when you reconnect"
+    "changesWillSync": "Changes will sync when you reconnect",
+    "queuedTitle": "Saved offline",
+    "queuedDescription": "The action was queued and will sync automatically when you reconnect."
   },
   "sidebar": {
     "browse": "Browse",
